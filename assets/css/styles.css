@@ -305,3 +305,14 @@ input[aria-invalid="true"], select[aria-invalid="true"], textarea[aria-invalid="
   .f1 { order: 2; } .f2 { order: 3; }
   .glow { top: 0; }
 }
+
+/* contact flow + discord */
+.flow { list-style: none; margin: 0 0 28px; padding: 0; display: grid; grid-template-columns: repeat(3, 1fr); gap: 12px; }
+.flow li { display: flex; align-items: center; gap: 12px; flex-wrap: wrap; background: var(--surface); border: 1px solid var(--line); border-radius: var(--radius); padding: 14px 16px; color: var(--muted); font-size: .92rem; }
+.flow b { flex: none; width: 28px; height: 28px; display: grid; place-items: center; border-radius: 50%; background: color-mix(in srgb, var(--accent) 14%, transparent); color: var(--accent); font: 700 .8rem var(--mono); }
+.btn.discord { border-color: #5865f2; background: color-mix(in srgb, #5865f2 18%, var(--surface)); }
+.btn.discord:hover { border-color: #8b95ff; }
+@media (max-width: 760px) { .flow { grid-template-columns: 1fr; } }
+
+.flow li { align-items: flex-start; }
+.flow li > span { flex: 1 1 180px; }

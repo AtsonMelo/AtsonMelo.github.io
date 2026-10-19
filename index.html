@@ -5,6 +5,7 @@
   <meta name="viewport" content="width=device-width, initial-scale=1">
   <title>DEVLAB — Atson Melo | FiveM Developer</title>
   <meta name="description" content="Custom FiveM resources in Lua, modern NUI interfaces and system integrations. Stability, performance and maintainability, backed by automated tests. By Atson Melo.">
+  <meta http-equiv="Content-Security-Policy" content="default-src 'self'; script-src 'self'; style-src 'self'; img-src 'self' data:; connect-src 'none'; frame-src 'self'; object-src 'none'; base-uri 'none'; form-action 'none'">
   <meta name="theme-color" content="#0a0d12">
   <link rel="canonical" href="https://atsonmelo.github.io/">
   <link rel="icon" href="assets/img/favicon.svg" type="image/svg+xml">
@@ -20,7 +21,7 @@
   <meta name="twitter:card" content="summary_large_image">
 
   <link rel="stylesheet" href="assets/css/styles.css">
-  <script>document.documentElement.classList.add('js')</script>
+  <script src="assets/js/boot.js"></script>
   <script type="application/ld+json">
   {"@context":"https://schema.org","@type":"Person","name":"Atson Melo","jobTitle":"FiveM Developer","url":"https://atsonmelo.github.io/","sameAs":["https://github.com/AtsonMelo"],"knowsAbout":["FiveM","Lua","JavaScript","NUI","Qbox"]}
   </script>
@@ -40,7 +41,7 @@
     </nav>
     <div class="bar-actions">
       <a class="btn small primary bar-cta" href="#quote" data-i18n="nav.quote">Request a quote</a>
-      <button class="lang" id="lang" type="button" aria-label="Language / Idioma" data-lang="en"><span data-l="en">EN</span><i aria-hidden="true">/</i><span data-l="pt">PT</span></button>
+      <button class="lang" id="lang" type="button" aria-label="EN / PT: language / idioma" data-lang="en"><span data-l="en">EN</span><i aria-hidden="true">/</i><span data-l="pt">PT</span></button>
       <button class="burger" id="burger" type="button" aria-label="Menu" aria-expanded="false" aria-controls="nav"><span></span><span></span></button>
     </div>
   </div>
@@ -54,10 +55,11 @@
       <p class="eyebrow"><span class="dot" aria-hidden="true"></span><span data-i18n="hero.eyebrow">Atson Melo — FiveM Developer</span></p>
       <h1><span data-i18n="hero.h1a">FiveM development for servers that</span> <em data-i18n="hero.h1b">go beyond the basics.</em></h1>
       <p class="lead" data-i18n="hero.lead">We build custom Lua resources, modern NUI interfaces and integrations for FiveM servers, focused on stability, performance and maintainability.</p>
-      <p class="stack" aria-label="Stack"><span>Lua</span><span>JavaScript</span><span>NUI</span><span>Automated tests</span></p>
+      <p class="stack"><span>Lua</span><span>JavaScript</span><span>NUI</span><span>Automated tests</span></p>
       <div class="cta-row">
         <a class="btn primary" href="#quote" data-i18n="hero.cta2">Request a quote</a>
         <a class="btn" href="#projects" data-i18n="hero.cta1">View projects</a>
+        <a class="btn discord" href="#contact" rel="noopener" data-discord hidden><span data-i18n="cta.discord">Join Discord</span><span class="ext" aria-hidden="true">↗</span></a>
         <a class="btn ghost" href="https://github.com/AtsonMelo" rel="noopener" data-github>GitHub<span class="ext" aria-hidden="true">↗</span></a>
       </div>
     </div>
@@ -69,7 +71,7 @@
       </figure>
       <div class="float f1">
         <span class="f-label" data-i18n="hero.f1l">Automated tests</span>
-        <strong>1,180 <small>passed · 0 failed</small></strong>
+        <strong>1,180 <small data-i18n="hero.f1s">passed · 0 failed</small></strong>
         <span class="f-note" data-i18n="hero.f1n">offline &amp; simulated · snapshot 2026-10-19</span>
       </div>
       <div class="float f2">
@@ -263,12 +265,12 @@
     </header>
     <div class="ev-table" role="table" aria-label="Evidence">
       <div class="ev-row ev-head" role="row"><span role="columnheader" data-i18n="ev.c1">Item</span><span role="columnheader" data-i18n="ev.c2">Result</span><span role="columnheader" data-i18n="ev.c3">Source</span><span role="columnheader" data-i18n="ev.c4">Date</span></div>
-      <div class="ev-row" role="row"><span role="cell">devlab_core · Lua</span><span role="cell">29 passed, 0 failed</span><span role="cell" data-i18n="ev.s1">Offline suite, simulated natives</span><span role="cell">2026-10-19</span></div>
-      <div class="ev-row" role="row"><span role="cell">devlab_phone · Lua</span><span role="cell">617 passed, 0 failed</span><span role="cell" data-i18n="ev.s1">Offline suite, simulated natives</span><span role="cell">2026-10-19</span></div>
-      <div class="ev-row" role="row"><span role="cell">devlab_character · Lua</span><span role="cell">417 passed, 0 failed</span><span role="cell" data-i18n="ev.s1">Offline suite, simulated natives</span><span role="cell">2026-10-19</span></div>
-      <div class="ev-row" role="row"><span role="cell">devlab_phone · UI unit (Node)</span><span role="cell">5 passed, 0 failed</span><span role="cell" data-i18n="ev.s2">node --test</span><span role="cell">2026-10-19</span></div>
-      <div class="ev-row" role="row"><span role="cell">devlab_phone · UI end-to-end</span><span role="cell">112 passed, 0 failed</span><span role="cell" data-i18n="ev.s3">Headless Chromium, simulated bridge</span><span role="cell">2026-10-19</span></div>
-      <div class="ev-row ev-total" role="row"><span role="cell" data-i18n="ev.total">Total</span><span role="cell">1,180 passed, 0 failed</span><span role="cell" data-i18n="ev.s4">Private repository, commit aa99dd7</span><span role="cell">2026-10-19</span></div>
+      <div class="ev-row" role="row"><span role="cell">devlab_core · Lua</span><span role="cell" data-i18n="ev.rc">29 passed, 0 failed</span><span role="cell" data-i18n="ev.s1">Offline suite, simulated natives</span><span role="cell">2026-10-19</span></div>
+      <div class="ev-row" role="row"><span role="cell">devlab_phone · Lua</span><span role="cell" data-i18n="ev.rp">617 passed, 0 failed</span><span role="cell" data-i18n="ev.s1">Offline suite, simulated natives</span><span role="cell">2026-10-19</span></div>
+      <div class="ev-row" role="row"><span role="cell">devlab_character · Lua</span><span role="cell" data-i18n="ev.rch">417 passed, 0 failed</span><span role="cell" data-i18n="ev.s1">Offline suite, simulated natives</span><span role="cell">2026-10-19</span></div>
+      <div class="ev-row" role="row"><span role="cell">devlab_phone · UI unit (Node)</span><span role="cell" data-i18n="ev.ru">5 passed, 0 failed</span><span role="cell" data-i18n="ev.s2">node --test</span><span role="cell">2026-10-19</span></div>
+      <div class="ev-row" role="row"><span role="cell">devlab_phone · UI end-to-end</span><span role="cell" data-i18n="ev.re">112 passed, 0 failed</span><span role="cell" data-i18n="ev.s3">Headless Chromium, simulated bridge</span><span role="cell">2026-10-19</span></div>
+      <div class="ev-row ev-total" role="row"><span role="cell" data-i18n="ev.total">Total</span><span role="cell" data-i18n="ev.rt">1,180 passed, 0 failed</span><span role="cell" data-i18n="ev.s4">Private repository, commit aa99dd7</span><span role="cell">2026-10-19</span></div>
       <div class="ev-row" role="row"><span role="cell">devlab_core · real FXServer</span><span role="cell" data-i18n="ev.r5">Resource started, JSON log and console command verified</span><span role="cell" data-i18n="ev.s5">Local FXServer, loopback only</span><span role="cell">2026-10-18</span></div>
       <div class="ev-row" role="row"><span role="cell">Qbox PR #780</span><span role="cell" data-i18n="ev.r6">Open, review required, not merged</span><span role="cell"><a href="https://github.com/Qbox-project/qbx_core/pull/780" rel="noopener">GitHub ↗</a></span><span role="cell">2026-10-19</span></div>
     </div>
@@ -322,6 +324,16 @@
       <h2 data-i18n="ct.title">Have a FiveM project in mind? Let’s build it.</h2>
       <p class="sub" data-i18n="ct.sub">Describe what your server needs. The form prepares a clear brief that you send through any available channel.</p>
     </header>
+    <ol class="flow" id="flow-generic" aria-label="How to request">
+      <li><b>1</b><span data-i18n="fl.1">Describe your project in the form.</span></li>
+      <li><b>2</b><span data-i18n="fl.2">Copy the brief it prepares.</span></li>
+      <li><b>3</b><span data-i18n="fl.g3">Send it through the channel you prefer below.</span></li>
+    </ol>
+    <ol class="flow" id="flow-discord" aria-label="How to request via Discord" hidden>
+      <li><b>1</b><span data-i18n="fl.1">Describe your project in the form.</span></li>
+      <li><b>2</b><span data-i18n="fl.2">Copy the brief it prepares.</span></li>
+      <li><b>3</b><span data-i18n="fl.d3">Join the DevLab Discord and paste it in a private thread in #solicitar-orcamento.</span> <a class="btn small primary" href="#" rel="noopener" data-discord data-i18n="cta.discord">Join Discord</a></li>
+    </ol>
     <div class="contact-grid">
       <form class="quote" id="quote" novalidate aria-labelledby="quote-h">
         <h3 id="quote-h" data-i18n="q.title">Request a quote</h3>
@@ -362,7 +374,7 @@
         <p class="privacy" data-i18n="q.privacy">Nothing is sent or stored by this page. The brief is generated in your browser; you choose where to send it.</p>
 
         <div class="brief" id="brief" hidden>
-          <label for="q-brief" data-i18n="q.brief">Your brief (English)</label>
+          <label for="q-brief" data-i18n="q.brief">Your brief: not sent yet (written in English)</label>
           <textarea id="q-brief" rows="10" readonly></textarea>
           <div class="brief-actions" id="brief-actions"></div>
           <p class="note" id="brief-status" role="status" aria-live="polite"></p>

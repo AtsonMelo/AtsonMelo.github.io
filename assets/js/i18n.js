@@ -169,7 +169,7 @@ window.I18N_PT = {
   "q.contactPh": "Usuário do Discord, e-mail ou outro",
   "q.submit": "Preparar meu briefing",
   "q.privacy": "Esta página não envia nem armazena nada. O briefing é gerado no seu navegador; você escolhe para onde enviá-lo.",
-  "q.brief": "Seu briefing (em inglês)",
+  "q.brief": "Seu briefing: ainda não enviado (escrito em inglês)",
   "ch.title": "Canais",
   "d.arch": "Arquitetura",
   "d.resp": "Responsabilidades",
@@ -179,5 +179,17 @@ window.I18N_PT = {
   "p.char.a5": "Os comandos são limitados a jogadores autorizados por uma permissão ACE; erros de armazenamento e de handlers são contidos e registrados.",
   "p.core.a3": "Limite de taxa por jogador, log JSON estruturado e um comando de status protegido por ACE.",
   "p.core.r1": "Independente de framework. Os módulos são carregados em ordem pelo manifesto porque o Lua puro do Cfx não tem <code>require</code> local de recurso.",
-  "p.core.r2": "Os recursos não dependem uns dos outros em tempo de execução; Phone e Character reaproveitam os mesmos padrões (módulos carregados pelo manifesto, validação, limite de taxa)."
+  "p.core.r2": "Os recursos não dependem uns dos outros em tempo de execução; Phone e Character reaproveitam os mesmos padrões (módulos carregados pelo manifesto, validação, limite de taxa).",
+  "hero.f1s": "aprovados · 0 falhas",
+  "ev.rc": "29 aprovados, 0 falhas",
+  "ev.rp": "617 aprovados, 0 falhas",
+  "ev.rch": "417 aprovados, 0 falhas",
+  "ev.ru": "5 aprovados, 0 falhas",
+  "ev.re": "112 aprovados, 0 falhas",
+  "ev.rt": "1.180 aprovados, 0 falhas",
+  "cta.discord": "Entrar no Discord",
+  "fl.1": "Descreva seu projeto no formulário.",
+  "fl.2": "Copie o briefing que ele prepara.",
+  "fl.g3": "Envie por um dos canais abaixo.",
+  "fl.d3": "Entre no Discord do DevLab e cole em um tópico privado em #solicitar-orcamento."
 };

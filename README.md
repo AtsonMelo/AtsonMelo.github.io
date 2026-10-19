@@ -12,7 +12,9 @@ assets/js/main.js     language toggle, menu, dialogs, contact render, reveal
 assets/img/           phone-*.webp (screenshots), og.png, favicon.svg
 tools/                og.html + make-og.py (social image); sync-demo.py + demo/ (phone demo build)
 demo/phone/           GENERATED copy of the phone NUI + in-browser simulator (do not edit by hand)
-tests/qa.py           local QA (console, overflow, links, i18n, dialogs, scan)
+tests/qa.py           local QA (console, links, i18n, security posture, demo, quote flow, scan)
+tests/test_tools.py   offline tests of the Discord/contact tools
+tools/                preflight.py (go/no-go), verify-evidence.py, sync-demo.py, set-contact.py, discord_apply.py
 docs/                 QA report, publishing review
 ```
 
@@ -57,3 +59,11 @@ No backend. The form builds an English brief in the browser (nothing sent or sto
 
 ## Evidence numbers
 Dated snapshots, edited by hand in `index.html` (hero float, proof strip, evidence table, dialogs). Re-run the fivem-lab suites (`scripts/test-all.ps1 -Ui`, plus `e2e.py`) and update date/commit before each publish; `tests/qa.py` fails if the old total reappears.
+
+## Go/no-go and contact tooling
+```
+python tools/preflight.py --src <fivem-lab> --python <fivem-lab>\.venv\Scripts\python.exe   # verdict before publishing
+python tools/set-contact.py --discord https://discord.gg/CODE --check-online                # validated invite into config.js
+python tests/test_tools.py
+```
+Discord server setup (channels, texts, private-thread quote flow, optional bot script): `docs/discord/SETUP.md`. Publishing plan and rollback: `docs/PUBLISH-PLAN.md`. Security analysis and results: `docs/QA-AND-SECURITY.md`.

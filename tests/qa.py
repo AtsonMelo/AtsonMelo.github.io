@@ -9,6 +9,8 @@ if shots: shots.mkdir(parents=True, exist_ok=True)
 
 class Q(http.server.SimpleHTTPRequestHandler):
     def log_message(self, *a): pass
+    def end_headers(self):  # GitHub Pages sends this header on every response (verified with curl on pages.github.com)
+        self.send_header("Access-Control-Allow-Origin", "*"); super().end_headers()
 httpd = http.server.ThreadingHTTPServer(("127.0.0.1", 0), functools.partial(Q, directory=str(ROOT)))
 threading.Thread(target=httpd.serve_forever, daemon=True).start()
 base = f"http://127.0.0.1:{httpd.server_address[1]}/"
@@ -92,12 +94,35 @@ with sync_playwright() as pw:
             fr.locator("#btn-x").click(); fr.locator("#hud-button").wait_for(state="visible", timeout=3000); check("demo: close -> HUD button", fr.locator("#hud-button").is_visible())
             fr.locator("#hud-button").click(); fr.locator("#phone").wait_for(state="visible", timeout=3000); check("demo: reopen", fr.locator("#phone").is_visible())
             if shots: pg.locator("#demo").scroll_into_view_if_needed(); pg.wait_for_timeout(300); pg.locator("#demo").screenshot(path=str(shots / "demo-running.png"))
+            check("unconfigured: no Discord button/flow shown, generic flow visible", pg.locator("[data-discord]:visible").count() == 0 and pg.locator("#flow-generic").is_visible() and not pg.locator("#flow-discord").is_visible())
+            check("unconfigured: no discord.gg link anywhere in the DOM", pg.evaluate("[...document.querySelectorAll('a')].every(a => !/discord\\.(gg|com)/.test(a.href))"))
+            # security posture of the demo iframe and the page CSP
+            csp = pg.locator("meta[http-equiv=Content-Security-Policy]").get_attribute("content")
+            check("page CSP present, no inline script/unsafe-eval/network", csp and "unsafe-inline" not in csp and "unsafe-eval" not in csp and "connect-src 'none'" in csp, str(csp))
+            check("no inline <script> without a type (CSP-safe)", pg.evaluate("[...document.scripts].every(s => s.src || s.type === 'application/ld+json')"))
+            ifr = pg.locator("iframe.demo-frame")
+            check("demo iframe: sandbox is exactly allow-scripts (opaque origin)", ifr.get_attribute("sandbox") == "allow-scripts", str(ifr.get_attribute("sandbox")))
+            check("demo iframe: parent cannot read frame DOM", pg.evaluate("(() => { try { document.querySelector('iframe').contentDocument.body; return false } catch (e) { return true } })()") or pg.evaluate("document.querySelector('iframe').contentDocument === null"))
+            check("demo iframe: no referrer, no powerful features", ifr.get_attribute("referrerpolicy") == "no-referrer" and ifr.get_attribute("allow") == "")
+            check("demo document: CSP without network, nothing external", "connect-src 'self';" in fr.locator("xpath=/html/head/meta[@http-equiv='Content-Security-Policy']").get_attribute("content"))
+            # keyboard: demo reachable and operable without a mouse
+            fr.locator("#btn-home").click(); fr.locator("[data-app=vehicles]").focus(); pg.keyboard.press("Enter")
+            check("demo: app opens with the keyboard", fr.locator(".screen-title").inner_text().strip() == "Veículos")
+            check("demo: generic vehicle name (no trademark)", "Bugatti" not in fr.locator("body").inner_text() and "Supercarro" in fr.locator("body").inner_text())
+            fr.locator("#btn-home").click()
+            # dialog keyboard flow: Enter opens, Esc closes, focus returns to the opener
+            op = pg.locator("[data-open=dlg-oss]").first; op.focus(); pg.keyboard.press("Enter")
+            check("dialog opens with Enter", pg.evaluate("document.getElementById('dlg-oss').open"))
+            pg.keyboard.press("Escape")
+            check("Esc closes dialog and focus returns to opener", (not pg.evaluate("document.getElementById('dlg-oss').open")) and pg.evaluate("document.activeElement.getAttribute('data-open')") == "dlg-oss")
             # i18n
             en = pg.locator("h2").first.inner_text()
             pg.locator("#lang").click()
             check("PT toggle sets lang + text", pg.evaluate("document.documentElement.lang") == "pt-BR" and pg.locator("h2").first.inner_text() != en)
             missing = pg.evaluate("[...document.querySelectorAll('[data-i18n]')].map(n => n.getAttribute('data-i18n')).filter(k => !(k in window.I18N_PT))")
             check("every data-i18n key has PT", not missing, str(missing))
+            ptxt = pg.locator("body").inner_text()
+            check("PT: test indicators translated (no passed/failed)", "passed" not in ptxt and "failed" not in ptxt and "aprovados" in ptxt, "")
             check("PT placeholders translated", "Usuário" in pg.locator("#q-contact").get_attribute("placeholder"))
             if shots: pg.screenshot(path=str(shots / "desktop-pt-top.png"))
             pg.locator("#lang").click(); check("EN restored", pg.locator("h2").first.inner_text() == en)
@@ -112,6 +137,9 @@ with sync_playwright() as pw:
     pg.locator("#quote button[type=submit]").click()
     hrefs = pg.evaluate("[...document.querySelectorAll('#brief-actions a')].map(a => a.href)")
     check("configured: mailto, discord and issue actions", any(h.startswith("mailto:a@example.test") for h in hrefs) and any("discord.gg" in h for h in hrefs) and any("github.com/o/r/issues/new" in h for h in hrefs), str(hrefs))
+    check("configured: hero Discord button points to the invite, opens safely", pg.locator(".hero [data-discord]").is_visible() and pg.locator(".hero [data-discord]").get_attribute("href") == "https://discord.gg/example" and "noopener" in pg.locator(".hero [data-discord]").get_attribute("rel") and pg.locator(".hero [data-discord]").get_attribute("target") == "_blank")
+    check("configured: Discord flow visible, generic hidden", pg.locator("#flow-discord").is_visible() and not pg.locator("#flow-generic").is_visible())
+    check("configured: status says brief was NOT sent", "NOT sent" in pg.locator("#brief-status").inner_text(), pg.locator("#brief-status").inner_text())
     check("configured: channel cards rendered", pg.locator("#channels li").count() == 3 and not pg.locator("#channels-note").is_visible())
     ctx.close()
     # mobile: demo iframe fits viewport
@@ -129,9 +157,16 @@ with sync_playwright() as pw:
     ctx.close(); br.close()
 
 # static hygiene
-text = "".join(p.read_text(encoding="utf-8", errors="ignore") for p in ROOT.rglob("*") if p.is_file() and ".git" not in p.parts and p.suffix in {".html", ".js", ".css", ".md", ".xml", ".txt", ".svg", ".py"} and p.name != "qa.py")
-for pat, why in ((r"\b(?:10|192\.168|172\.(?:1[6-9]|2\d|3[01]))\.\d+\.\d+(?:\.\d+)?\b", "private IP"), (r"(?i)sv_licensekey|secrets\.cfg|server\.cfg|api[_-]?key|password|token\s*[:=]", "secret-like"), (r"[A-Z]:\Atson", "local path")):
+text = "".join(p.read_text(encoding="utf-8", errors="ignore") for p in ROOT.rglob("*") if p.is_file() and ".git" not in p.parts and p.parent.name != "messages" and p.suffix in {".html", ".js", ".css", ".md", ".xml", ".txt", ".svg", ".py"} and p.name != "qa.py")
+for pat, why in ((r"\b(?:10|192\.168|172\.(?:1[6-9]|2\d|3[01]))\.\d+\.\d+(?:\.\d+)?\b", "private IP"), (r"(?i)sv_licensekey|secrets\.cfg|server\.cfg|api[_-]?key|password|token\s*[:=]\s*[\x22\x27][A-Za-z0-9._-]{16,}|[MN][A-Za-z\d]{23}\.[\w-]{6}\.[\w-]{27}|discord(?:app)?\.com/api/webhooks/", "secret-like"), (r"[A-Z]:\Atson", "local path")):
     hit = re.findall(pat, text)
     check(f"static scan: no {why}", not hit, str(hit[:3]))
+html = (ROOT / "index.html").read_text(encoding="utf-8")
+check("no root-relative href/src (breaks nothing on a user site, but keeps the site relocatable)", not re.findall(r'(?:href|src)="/(?!/)', html))
+served = "".join(p.read_text(encoding="utf-8", errors="ignore") for p in [ROOT / "index.html", *(ROOT / "demo").rglob("*"), *(ROOT / "assets").rglob("*")] if p.is_file() and p.suffix in {".html", ".js", ".css", ".txt", ".svg"})
+check("served files do not mention the trademark demo name", not re.search(r"(?i)bugatti", served))
+src_txt = (ROOT / "demo" / "phone" / "SOURCE.txt").read_text(encoding="utf-8")
+check("demo SOURCE.txt records commit and scripted deviations", re.search(r"commit [0-9a-f]{7}", src_txt) and "Scripted deviations" in src_txt)
+check("NOTICE.md present", (ROOT / "NOTICE.md").is_file())
 print(f"QA: {ok} passed, {bad} failed")
 sys.exit(1 if bad else 0)

@@ -49,7 +49,7 @@ export function home(_param, ctx) {
     h('span', { class: 'ws-big' }, big), h('span', { class: 'ws-sub' }, sub));
   const widgetsRow = h('div', { class: 'widgets-row' },
     small('widget-bank', 'bank.home', 'wallet', 'bank', 'Banco', money(bank.balanceCents), 'Saldo disponível'),
-    small('widget-veh', 'veh.list', 'car', 'veh', 'Veículos', 'Bugatti Chiron', 'Toque para chamar'));
+    small('widget-veh', 'veh.list', 'car', 'veh', 'Veículos', 'Supercarro (demo)', 'Toque para chamar'));
 
   const tiles = APPS.map((app) => h('button', { type: 'button', class: 'app-tile', 'data-app': app.id, title: app.label,
     'aria-label': app.label, onclick: () => ctx.router.push(app.route) },

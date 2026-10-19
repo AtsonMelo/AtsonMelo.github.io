@@ -8,7 +8,7 @@ const STATE_LABEL = { stored: 'Guardado', out: 'Fora' };
 const STEPS = ['Solicitado', 'Despachando', 'A caminho', 'Chegou'];
 const STEP_MS = 1500;
 
-const REAL_VEHICLE = { id: 'chiron', name: 'Bugatti Chiron' };
+const REAL_VEHICLE = { id: 'chiron', name: 'Supercarro (demo)' };
 const RETRY_UI_MS = 1500; // the server enforces the real cooldown; this only stops accidental double clicks
 
 /** The one REAL vehicle: asks the server (vehicles.call) to spawn the test car next to the player. */

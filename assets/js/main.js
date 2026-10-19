@@ -88,6 +88,13 @@
     [].forEach.call(doc.querySelectorAll('[data-github]'), function (a) { a.href = cfg.github; });
   }
   if (!direct) doc.getElementById('channels-note').hidden = false;
+  // Discord entry points exist only when a real invite is configured (never a dead or invented link).
+  var hasDiscord = !!cfg.discordUrl;
+  [].forEach.call(doc.querySelectorAll('[data-discord]'), function (a) {
+    if (hasDiscord) { a.hidden = false; a.href = cfg.discordUrl; a.target = '_blank'; a.rel = 'noopener noreferrer'; }
+  });
+  doc.getElementById('flow-discord').hidden = !hasDiscord;
+  doc.getElementById('flow-generic').hidden = hasDiscord;
 
   doc.getElementById('year').textContent = new Date().getFullYear();
 
@@ -99,7 +106,10 @@
     f.className = 'demo-frame';
     f.src = 'demo/phone/index.html';
     f.title = doc.documentElement.lang === 'pt-BR' ? 'Demonstração interativa do DevLab Phone (simulada)' : 'DevLab Phone interactive demo (simulated)';
-    // First-party same-origin page: a sandbox with allow-scripts+allow-same-origin adds no isolation (and Chromium warns).
+    // Opaque origin (no allow-same-origin): the demo cannot touch this page's DOM, storage or cookies. It still runs its scripts.
+    f.setAttribute('sandbox', 'allow-scripts');
+    f.setAttribute('allow', '');
+    f.setAttribute('referrerpolicy', 'no-referrer');
     stage.replaceChild(f, stage.querySelector('.demo-poster'));
     f.addEventListener('load', function () { try { f.contentWindow.focus(); } catch (e) { /* ignore */ } });
   });
@@ -152,12 +162,13 @@
     doc.getElementById('q-brief').value = text;
     doc.getElementById('brief').hidden = false;
     var box = doc.getElementById('brief-actions'); var status = doc.getElementById('brief-status');
-    box.textContent = ''; say(status, '');
+    box.textContent = ''; say(status, pt ? 'Ainda não enviado. Escolha como enviar.' : 'Not sent yet. Choose how to send it.');
     box.appendChild(action(pt ? 'Copiar briefing' : 'Copy brief', null, function () { copy(text, status); }));
     var subject = encodeURIComponent('FiveM project request');
     if (cfg.email) box.appendChild(action(pt ? 'Enviar por e-mail' : 'Send by e-mail', 'mailto:' + cfg.email + '?subject=' + subject + '&body=' + encodeURIComponent(text)));
     if (cfg.discordUrl) box.appendChild(action(pt ? 'Copiar e abrir Discord' : 'Copy and open Discord', cfg.discordUrl, function () { copy(text, status); }));
     if (cfg.issuesRepo) box.appendChild(action(pt ? 'Abrir como issue pública no GitHub' : 'Open as public GitHub issue', 'https://github.com/' + cfg.issuesRepo + '/issues/new?title=' + subject + '&body=' + encodeURIComponent(text)));
+    if (cfg.discordUrl) say(status, pt ? 'Briefing pronto, mas NÃO enviado. Copie, entre no Discord e cole em um tópico privado em #solicitar-orcamento.' : 'Brief ready, but NOT sent. Copy it, join Discord and paste it in a private thread in #solicitar-orcamento.');
     if (!cfg.email && !cfg.discordUrl && !cfg.issuesRepo) say(status, pt ? 'Os canais diretos ainda estão sendo configurados. Copie o briefing e envie pelo GitHub.' : 'Direct channels are still being set up. Copy the brief and reach out via GitHub.');
     doc.getElementById('q-brief').scrollIntoView({ block: 'nearest' });
   });
