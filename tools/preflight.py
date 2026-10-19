@@ -29,7 +29,7 @@ bad = [f for f in files if re.search(r"(?i)(\.env|\.cfg|\.pem|\.key|\.pfx|secret
 print(f"files to publish: {len(files)}, total {sum((root / f).stat().st_size for f in files) // 1024} KB; > 1 MB: {big or 'none'}; forbidden names: {bad or 'none'}")
 if big or bad: blockers.append("oversized or forbidden-looking file in the tracked set")
 
-cfg = (root / "assets/js/config.js").read_text(encoding="utf-8")
+cfg = (root / "assets/js/config.js").read_text(encoding="utf-8").split("window.SITE_CONFIG", 1)[1]  # skip the explanatory comment
 val = lambda k: (re.search(rf'{k}:\s*"([^"]*)"', cfg) or [None, ""])[1]
 for k in ("discordUrl", "email"):
     print(f"contact {k}: {'SET' if val(k) else 'EMPTY'}")
