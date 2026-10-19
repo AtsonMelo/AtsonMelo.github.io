@@ -1,53 +1,85 @@
-# DevLab Discord: commercial channel setup
+# DevLab Discord
 
-State on 2026-10-19: no Discord integration, token, CLI or logged-in browser session was available to Claude Code, so **nothing was created on the server and no invite exists**. Everything below is ready to apply. Existing channels (`#geral`, `#estrada-smart`, `#github-updates`, voice Geral) are never touched.
+Diagnosis on 2026-10-19, read-only, bot `DevLab Automation` (not Administrator). The server is **DevLab**, about 2 members, verification level **None**, boost tier 0, not a Community server. No public invite was created.
 
-## 0. Read this before sharing any invite (security)
-A public invite lets anyone join and see every channel that `@everyone` can view.
-1. **`#github-updates`**: if it receives events from the private `fivem-lab` repo (commits, PRs, branch names), it leaks private work to every invitee. Make it private (Channel settings → Permissions → `@everyone` → View Channel ✗) or confirm it only shows public repos.
-2. **`#estrada-smart`** (another project) and **`#geral`**: decide if they should be visible to visitors. If not, same permission change.
-3. Server Settings → **Safety Setup**: verification level at least *Low* (verified e-mail), and enable **Rules Screening** if the server is a Community server.
-4. Do not give any role Administrator except the owner. Do not install bots you do not need.
+## What is there now
 
-## 1. Layout (blueprint: `blueprint.json`, texts: `messages/`)
-| Category | Channel | @everyone can | Purpose |
+| Where | Channel | @everyone can view | Notes |
 |---|---|---|---|
-| DEVLAB | `#boas-vindas` | read, react | welcome, rules, invite target |
-| DEVLAB | `#portfolio` | read, react | projects with honest status |
-| ATENDIMENTO | `#solicitar-orcamento` | read, **create private threads**, write in threads (not in the channel) | quote requests, one private thread per client |
-| ATENDIMENTO | `#suporte` | read, write | public questions; secrets forbidden by the pinned text |
+| Canais de Texto | `#geral` | yes | 1 bot message, no useful history. Do not rename or move without approval. |
+| Canais de Texto | `#estrada-smart` | yes | Empty. Project channel. Public until a lock is approved. |
+| Canais de Texto | `#github-updates` | yes | Empty. No webhook payload yet, so nothing private has leaked. The channel is still open to every future member. |
+| Canais de Voz | `Geral` | yes (connect/speak) | Leave it. |
 
-Private data rule: quotes and anything with server details go in a **private thread** (visible only to the requester, the owner and members with *Manage Threads*). No bot or ticket plugin is required.
+There is no staff role. Roles are `@everyone` and the bot's managed role. `@everyone` can view, send, create public and private threads, mention everyone, and create invites. No channel has a permission overwrite. The bot can manage channels and roles, send messages, and create invites. It cannot manage the guild or threads, and it must not be given Administrator.
 
-## 2. Path A: by hand (about 10 minutes, no bot)
-1. Create the categories **DEVLAB** and **ATENDIMENTO** and the four channels above (type: text), with the topics from `blueprint.json`.
-2. Permissions per channel (Channel settings → Permissions → `@everyone`):
-   - `#boas-vindas`, `#portfolio`: Send Messages ✗, Create Public/Private Threads ✗, Add Reactions ✓.
-   - `#solicitar-orcamento`: Send Messages ✗, Create Public Threads ✗, **Create Private Threads ✓**, **Send Messages in Threads ✓**.
-   - `#suporte`: Send Messages ✓, Mention @everyone ✗, Create Private Threads ✗.
-3. Paste each file from `messages/` into its channel (they are written for Discord markdown, PT-BR then EN). In the posted text, replace the channel names with real mentions by typing `#`. Pin the message.
-4. Invite: open `#boas-vindas` → **Invite people** → **Edit invite link** → *Expire after* **Never**, *Max number of uses* **No limit** → copy the link.
+## Target
 
-## 3. Path B: script (needs a bot, token never leaves your machine)
-Only if you want the channels, texts and invite created for you.
-1. https://discord.com/developers/applications → **New Application** → **Bot** → *Reset Token* → copy it.
-2. OAuth2 → URL Generator: scope `bot`, permissions **View Channels, Manage Channels, Send Messages, Create Instant Invite** (add *Manage Roles* only if you want the script to set the permissions of step 2 as well). **Never Administrator.** Open the URL and add the bot to the DevLab server.
-3. Discord → User Settings → Advanced → Developer Mode on; right-click the server → **Copy Server ID**.
-4. In PowerShell, in this repo:
+New categories and channels are created only where something is missing. Existing channels stay put until a move is approved.
+
+| Category | Channel | Action | @everyone after an approved apply |
+|---|---|---|---|
+| DEVLAB \| INÍCIO | `#boas-vindas` `#portfolio` `#novidades` | create | read, react, no send |
+| DEVLAB \| COMERCIAL | `#solicitar-orcamento` | create | read, create **private** threads, write in threads, no channel messages, no public threads |
+| DEVLAB \| COMERCIAL | `#suporte` | create | read and write, no @everyone mention, no private threads |
+| (stays) | `#geral` | reuse | unchanged until a separate approval |
+| DEVLAB \| EQUIPE — PRIVADO | `#github-updates` `#estrada-smart` | reuse, then lock in place | view denied |
+| DEVLAB \| EQUIPE — PRIVADO | `#dev-interno` | create already locked | view denied |
+| Canais de Voz | `Geral` | keep | unchanged |
+
+Denying view for `@everyone` also denies it for the bot unless the same request allows the bot role. The tool sends both overwrites together and refuses to hide a channel from itself. It will not replace overwrites that mention some other user or role.
+
+## Quotes
+
+Private threads are the flow. Discord's API creates a private thread **without** a public starter message (`Start Thread without Message`, type `GUILD_PRIVATE_THREAD`, text channels only). Visibility is the author, people who were added, and anyone with Manage Threads. The owner sees them. This server's `@everyone` already has Create Private Threads and Send Messages in Threads. No boost is required.
+
+`#solicitar-orcamento` must deny Send Messages and Create Public Threads so a brief cannot be typed into the channel or into a public thread. The site only copies the brief; it does not send it.
+
+Not proven yet: a non-owner Discord client may hide the private-thread control. The owner's client is not a valid test. After the channel exists, one second account has to open a private thread and another member must confirm they cannot see it. If the client refuses, the visitor posts only `quero um orçamento` in `#suporte` and the owner adds them to a private thread. A resident ticket bot is not justified while that fallback works.
+
+A future teammate who is not the owner needs Manage Threads on that channel. The bot does not hold Manage Threads, so it cannot grant that bit. The owner sets it in the client, or grants the bit to the bot first.
+
+## Commands
+
+Token file: `%LOCALAPPDATA%\DevLab\Secrets\discord-bot-token.xml`. Do not print, copy, or commit it.
+
 ```
-$env:DISCORD_BOT_TOKEN = '<token>'            # current session only; never commit it
-python tools/discord_apply.py --guild <server id>                     # dry-run: shows the plan
-python tools/discord_apply.py --guild <server id> --yes               # create channels, post texts, create invite
-python tools/discord_apply.py --guild <server id> --yes --apply-permissions   # also set the access table above
+pwsh -File tools/discord.ps1                  # diagnose + diff, no writes
+pwsh -File tools/discord.ps1 -Action verify   # exit 1 while an internal channel is public
 ```
-The script only creates what is missing, never edits or deletes anything, posts messages only into channels it just created, and prints the permanent invite. Afterwards remove the bot from the server and reset its token (Developer Portal).
 
-## 4. Put the invite on the site
+These write to Discord only when `-Approve` names the scope:
+
+```
+pwsh -File tools/discord.ps1 -Action apply -Approve LockInternal
+pwsh -File tools/discord.ps1 -Action apply -Approve CreateChannels
+pwsh -File tools/discord.ps1 -Action apply -Approve PostMessages
+pwsh -File tools/discord.ps1 -Action apply -Approve CreateInvite
+```
+
+`LockInternal` is the privacy gate: it denies `@everyone` view on `#github-updates` and `#estrada-smart` where they already are. `CreateChannels` creates only missing categories and channels and puts their overwrites on the create, so a staff channel is never born public. `PostMessages` posts the files in `messages/` only into channels that same run created. `CreateInvite` makes one permanent, unlimited invite to `#boas-vindas` and refuses while any internal channel is still visible.
+
+Do this in that order: lock, create, post, prove a private thread with a second account, then invite. Rollback: `docs/discord/ROLLBACK.md`.
+
+## Site
+
+After the invite exists and has been checked:
+
 ```
 python tools/set-contact.py --discord https://discord.gg/<code> --check-online
 python tools/preflight.py
 ```
-`--check-online` asks Discord's public endpoint whether the invite works, which server/channel it opens and rejects expiring invites. Once `discordUrl` is set, the site shows **Join Discord** in the hero and in the contact flow, and the quote flow says the brief was **not** sent automatically: the visitor copies it, joins, and pastes it in a private thread in `#solicitar-orcamento`.
 
-## 5. Moderation basics
-Keep Developer Mode off for visitors, enable *Block messages with links from new members* only if spam appears, review the audit log weekly, and delete any visitor message that contains secrets.
+`discordUrl` is what shows **Entrar no Discord** / **Join Discord** and the quote steps. Empty means those controls stay hidden. The quote status must keep saying the brief was not sent.
+
+## GitHub
+
+Do not install a GitHub integration yet.
+
+- Public facts (published demo, confirmed fix, public release) can later be posted by hand, or by a webhook, in `#novidades`.
+- Private repositories, branches, commits, and internal issues belong in `#github-updates` only after `LockInternal`. The channel is empty today and must not receive a webhook before that.
+- No extra GitHub app is required for that split. A webhook per channel is enough, and only after the permission check passes.
+
+## Moderation
+
+Before the invite is public, the owner sets Server Settings → Safety to at least **Low** (verified email). The bot cannot change this (no Manage Guild). Keep Administrator on the owner only. Review the audit log when a member joins. Delete any message that contains a secret. Do not accept or distribute pirated assets.

@@ -44,4 +44,4 @@ axe "needs review" items (not violations): colour contrast on gradient/transluce
 Recommendation: fix in `devlab_phone`, then re-run `sync-demo.py`. They are real accessibility issues of the NUI, independent of the portfolio.
 
 ## 5. Not done
-Real-device testing, in-game verification, post-publish checks (impossible before publishing), Discord server configuration (no access, see `docs/discord/SETUP.md`).
+Real-device testing, in-game verification, post-publish checks (impossible before publishing). Discord was diagnosed read-only on 2026-10-19 (see `docs/discord/SETUP.md`); no channel, permission, message, or invite was changed.
