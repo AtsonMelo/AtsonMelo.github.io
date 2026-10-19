@@ -1,5 +1,5 @@
 **Projetos DEVLAB · DEVLAB projects**
-Status real, sem exageros. Três classes: **demonstrado** (dá para ver fora do jogo), **em desenvolvimento** (existe e foi testado, sem verificação visual no jogo) e **base** (recurso de referência, não é um produto para cliente). Detalhes e demo: https://atsonmelo.github.io *(link ativo após a publicação do site)*.
+Status real, sem exageros. Três classes: **demonstrado** (dá para ver fora do jogo), **em desenvolvimento** (existe e foi testado, sem verificação visual no jogo) e **base** (recurso de referência, não é um produto para cliente). Detalhes e demo publicados: https://atsonmelo.github.io/
 
 **Demonstrado · DevLab Phone**
 Celular customizado (NUI + Lua): início, garagem, mensagens e banco. A demo do navegador usa ponte simulada. Funcional e testado offline (617 asserções Lua, 5 testes Node, 112 verificações de interface em Chromium, 19/10/2026, 0 falhas). **Ainda não verificado dentro do jogo.** Banco e mensagens são simulação; nenhum valor real é movimentado.

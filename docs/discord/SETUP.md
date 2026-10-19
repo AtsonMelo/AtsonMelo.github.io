@@ -76,7 +76,18 @@ python tools/set-contact.py --discord https://discord.gg/JPfR8ekkrj --check-onli
 python tools/preflight.py
 ```
 
-`discordUrl` shows **Entrar no Discord** / **Join Discord** and the quote steps. The quote status must keep saying the brief was not sent. The site is not published by this change.
+`discordUrl` shows **Entrar no Discord** / **Join Discord** and the quote steps. The quote status must keep saying the brief was not sent. The invite change did not publish the site.
+
+Published later on 2026-10-19: https://atsonmelo.github.io/ at `8c1e94d39af23ebdd589fa08d3612f99f54e67ea`. Public checks on that URL: 35/35. Quotes stay manual, in a private thread.
+
+The bot's own institutional messages were edited in place on the post-launch pass. Same IDs, no second message. `#dev-interno` (`1561857831035080726`) was left as posted: it is private and did not say the site was unpublished. `#suporte` (`1561857825884340345`) was left as posted: its guidance was already the manual flow.
+
+| Channel | Message |
+|---|---|
+| `#boas-vindas` | `1561857802903756932` |
+| `#portfolio` | `1561857809245798490` |
+| `#novidades` | `1561857814085894214` |
+| `#solicitar-orcamento` | `1561857819827773480` |
 
 ## GitHub
 

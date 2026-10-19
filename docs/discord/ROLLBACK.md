@@ -20,3 +20,12 @@ The first command only prints the plan. With `-Approve Rollback` the tool:
 - deletes invite codes recorded in that run.
 
 It does not delete `#geral`, `#estrada-smart`, `#github-updates`, the voice channel, or any channel it did not create. If a created channel was renamed, rollback stops instead of guessing.
+
+## Text, docs, protection, and the site
+
+These are separate from the channel rollback above. Do not unpublish Pages as the first step, and do not delete a channel to undo a sentence.
+
+- Discord text: edit the same bot message back to `docs/discord/messages/` at `8c1e94d`. Do not post another message. `#dev-interno` was not changed in the launch text pass.
+- Documentation: revert that commit through a pull request.
+- `main` protection: `gh api -X DELETE repos/AtsonMelo/AtsonMelo.github.io/branches/main/protection`.
+- Site: revert the content commit through a pull request so Pages rebuilds. Unpublish only to take the site offline.

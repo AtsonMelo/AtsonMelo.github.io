@@ -1,9 +1,36 @@
-# Publishing plan: AtsonMelo/AtsonMelo.github.io (NOT executed)
+# Publishing plan: AtsonMelo/AtsonMelo.github.io
 
-Nothing below has been run. Every step that touches GitHub needs the owner's explicit approval.
+## Status (2026-10-19)
 
-## Facts checked (2026-10-19)
-- Repo `AtsonMelo/AtsonMelo.github.io` does **not** exist (name is free). Account `AtsonMelo` is a User account, so the repo name `<user>.github.io` publishes at **https://atsonmelo.github.io/** (root URL, no sub-path).
+The site is published. The procedure under "Original plan" is the record of what was run, not an open checklist.
+
+| Item | Value |
+|---|---|
+| URL | https://atsonmelo.github.io/ |
+| SHA | `8c1e94d39af23ebdd589fa08d3612f99f54e67ea` |
+| Date | 2026-10-19 |
+| Pages | legacy source `main` `/`, HTTPS enforced, build `built` |
+| Public QA | 35/35 on the live URL (desktop 1440, tablet 820, mobile 390) |
+| Discord | https://discord.gg/JPfR8ekkrj opens `#boas-vindas` |
+| Quotes | Manual. The form copies the brief and says it was not sent. |
+| `main` | Pull request required, including for admins. Force push off. Branch deletion off. No required status check: the only Actions workflow is `pages-build-deployment`, and it runs after `main` updates, so requiring it would block every PR. |
+| Known limits | `demo/phone/` (the phone NUI frontend) and `docs/` are public. This file still names a local path. That path is not a credential. `#dev-interno` was not edited in the post-launch text pass. |
+
+## Rollback after launch
+
+Use the lever that matches the failure. Do not unpublish Pages as the first step.
+
+1. Discord text: edit the same bot message back to the file in commit `8c1e94d`. Do not post a second message and do not delete the channel. Channel structure stays on `docs/discord/ROLLBACK.md`.
+2. Documentation: revert the doc commit through a pull request. History stays.
+3. `main` protection: `gh api -X DELETE repos/AtsonMelo/AtsonMelo.github.io/branches/main/protection`. That removes the rule only. It does not move commits or Pages.
+4. Site content: revert the content commit through a pull request. Pages rebuilds from the new `main` tip. `gh api -X DELETE repos/AtsonMelo/AtsonMelo.github.io/pages` is only for taking the site offline.
+
+## Original plan (executed 2026-10-19)
+
+Gate 0 below records the decisions that were still open before the owner authorized publication of `8c1e94d`. That commit already included `demo/phone/` and no license file. Those choices were published with it.
+
+## Facts checked before the repository existed
+- Repo `AtsonMelo/AtsonMelo.github.io` did not exist yet (the name was free). The status table above is the current record. Account `AtsonMelo` is a User account, so the repo name `<user>.github.io` publishes at **https://atsonmelo.github.io/** (root URL, no sub-path).
 - `AtsonMelo/fivem-lab` is **private** and stays private; nothing here references or links to it.
 - GitHub Pages sends `Access-Control-Allow-Origin: *` (verified with `curl -I https://pages.github.com/`). The sandboxed demo iframe depends on it for its ES modules.
 - A free-plan Pages site requires a **public** repo. Everything tracked in git becomes public, including `docs/`, `tests/`, `tools/`, `demo/`.
