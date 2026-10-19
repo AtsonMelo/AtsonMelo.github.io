@@ -134,6 +134,11 @@ check("staff channel denies @everyone view at creation", int(staff["permission_o
 check("bot keeps view on the staff channel", int(staff["permission_overwrites"][1]["allow"]) & VIEW and staff["permission_overwrites"][1]["id"] == BOTROLE)
 welcome = next(body for body in text_posts if body["name"] == "boas-vindas")
 check("welcome channel is readable but not writable by @everyone", int(welcome["permission_overwrites"][0]["allow"]) & VIEW and int(welcome["permission_overwrites"][0]["deny"]) & SEND)
+MENTION, INVITE = 1 << 17, 1 << 0
+public_text = [body for body in text_posts if body["name"] != "dev-interno"]
+check("public channels deny @everyone mentions and invites", public_text and all(int(body["permission_overwrites"][0]["deny"]) & MENTION and int(body["permission_overwrites"][0]["deny"]) & INVITE for body in public_text))
+quote = next(body for body in text_posts if body["name"] == "solicitar-orcamento")
+check("quote channel allows private threads only", int(quote["permission_overwrites"][0]["allow"]) & (1 << 36) and int(quote["permission_overwrites"][0]["deny"]) & (1 << 35) and int(quote["permission_overwrites"][0]["deny"]) & SEND)
 state["log"].clear()
 again = len(state["channels"])
 r2 = run("--guild", GUILD, "--yes", "--create-missing", "--apply-permissions")

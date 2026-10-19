@@ -1,17 +1,21 @@
 # DevLab Discord
 
-Diagnosis on 2026-10-19, read-only, bot `DevLab Automation` (not Administrator). The server is **DevLab**, about 2 members, verification level **None**, boost tier 0, not a Community server. No public invite was created.
+Applied on 2026-10-19, bot `DevLab Automation` (not Administrator). `LockInternal` and `CreateChannels` ran. No channel was renamed or moved. No welcome text was posted. No invite was created. Verification level is still **None**. Backups are under `%LOCALAPPDATA%\DevLab\discord-backups\`, not in this repo.
 
 ## What is there now
 
 | Where | Channel | @everyone can view | Notes |
 |---|---|---|---|
-| Canais de Texto | `#geral` | yes | 1 bot message, no useful history. Do not rename or move without approval. |
-| Canais de Texto | `#estrada-smart` | yes | Empty. Project channel. Public until a lock is approved. |
-| Canais de Texto | `#github-updates` | yes | Empty. No webhook payload yet, so nothing private has leaked. The channel is still open to every future member. |
-| Canais de Voz | `Geral` | yes (connect/speak) | Leave it. |
+| Canais de Texto | `#geral` | yes | Untouched. Still allows mentions and invites. |
+| Canais de Texto | `#estrada-smart` | no | Locked in place. Empty. |
+| Canais de Texto | `#github-updates` | no | Locked in place. Empty. Do not attach a webhook until this stays denied. |
+| DEVLAB \| INÍCIO | `#boas-vindas` `#portfolio` `#novidades` | yes, cannot send | No messages yet. |
+| DEVLAB \| COMERCIAL | `#solicitar-orcamento` | yes, private threads only | No messages yet. Test with a non-owner account before any public invite. |
+| DEVLAB \| COMERCIAL | `#suporte` | yes, can send | Mentions and invites denied. No messages yet. |
+| DEVLAB \| EQUIPE — PRIVADO | `#dev-interno` | no | Born private. No messages yet. |
+| Canais de Voz | `Geral` | yes (connect/speak) | Untouched. |
 
-There is no staff role. Roles are `@everyone` and the bot's managed role. `@everyone` can view, send, create public and private threads, mention everyone, and create invites. No channel has a permission overwrite. The bot can manage channels and roles, send messages, and create invites. It cannot manage the guild or threads, and it must not be given Administrator.
+There is no staff role. The owner sees every channel because Discord does not apply overwrites to the owner. The bot role is allowed to view the locked channels. `@everyone` still has Create Invite and Mention Everyone on the role itself; the new public channels deny both. `#geral` and the voice channel do not.
 
 ## Target
 
