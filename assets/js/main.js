@@ -99,7 +99,7 @@
     f.className = 'demo-frame';
     f.src = 'demo/phone/index.html';
     f.title = doc.documentElement.lang === 'pt-BR' ? 'Demonstração interativa do DevLab Phone (simulada)' : 'DevLab Phone interactive demo (simulated)';
-    f.setAttribute('sandbox', 'allow-scripts allow-same-origin');
+    // First-party same-origin page: a sandbox with allow-scripts+allow-same-origin adds no isolation (and Chromium warns).
     stage.replaceChild(f, stage.querySelector('.demo-poster'));
     f.addEventListener('load', function () { try { f.contentWindow.focus(); } catch (e) { /* ignore */ } });
   });

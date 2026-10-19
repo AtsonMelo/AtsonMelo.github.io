@@ -33,6 +33,7 @@ with sync_playwright() as pw:
         check(f"{label}: no horizontal scroll", pg.evaluate("document.documentElement.scrollWidth <= window.innerWidth + 1"), str(pg.evaluate("document.documentElement.scrollWidth")))
         check(f"{label}: exactly one h1", pg.locator("h1").count() == 1)
         check(f"{label}: all images have alt attr", pg.evaluate("[...document.images].every(i => i.hasAttribute('alt'))"))
+        pg.evaluate("document.querySelectorAll('img[loading=lazy]').forEach(i => i.loading = 'eager')"); pg.wait_for_timeout(500)
         check(f"{label}: all images loaded", pg.evaluate("[...document.images].every(i => i.complete && i.naturalWidth > 0)"))
         if shots:
             pg.evaluate("document.querySelectorAll('.reveal').forEach(e => e.classList.add('in'))")
@@ -87,6 +88,7 @@ with sync_playwright() as pw:
             fr.get_by_label("Chave PIX ou ID interno").fill("DL-0001"); fr.get_by_label("Valor").fill("25,00")
             fr.get_by_role("button", name="Continuar").click(); fr.get_by_role("button", name="Confirmar").click()
             check("demo: simulated PIX receipt", "SIMULAÇÃO" in fr.locator("[data-testid=receipt]").inner_text())
+            check("demo: no console warnings/errors after interaction", not errs, str(errs))
             fr.locator("#btn-x").click(); fr.locator("#hud-button").wait_for(state="visible", timeout=3000); check("demo: close -> HUD button", fr.locator("#hud-button").is_visible())
             fr.locator("#hud-button").click(); fr.locator("#phone").wait_for(state="visible", timeout=3000); check("demo: reopen", fr.locator("#phone").is_visible())
             if shots: pg.locator("#demo").scroll_into_view_if_needed(); pg.wait_for_timeout(300); pg.locator("#demo").screenshot(path=str(shots / "demo-running.png"))

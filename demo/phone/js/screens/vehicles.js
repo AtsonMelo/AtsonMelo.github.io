@@ -42,11 +42,11 @@ function realVehicleRow(ctx) {
     btn.disabled = true;
     btn.textContent = '…';
     routeRow.hidden = true;
-    setStatus('', 'Criando e verificando no jogo…');
+    setStatus('', 'Simulando a chamada (sem jogo)…');
     try {
       await ctx.request('vehicles.call', { vehicleId: REAL_VEHICLE.id });
       // reached only after the game confirmed it can see the vehicle (server waits for that)
-      setStatus('ok', `${REAL_VEHICLE.name} confirmado no jogo e marcado no mapa. Entre e dirija!`);
+      setStatus('ok', `${REAL_VEHICLE.name} confirmado (resposta simulada). No jogo, o servidor cria e verifica o veículo real.`);
       routeRow.hidden = false;
       routeSwitch.setAttribute('aria-checked', 'false');
     } catch (res) {

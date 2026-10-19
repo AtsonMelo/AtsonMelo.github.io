@@ -14,6 +14,9 @@ Not done: Lighthouse/axe, real devices, formal contrast measurement, in-game ver
 | Character: per-player persistence, ACE-restricted commands | server/main.lua (resource KVP, IsPlayerAceAllowed); offline tests only |
 V1 text said core was "shared by the other resources": corrected.
 
+## Visual inspection (2026-10-19)
+Browser walk-through of desktop 1440 and mobile 390 (Chromium): 34 checks, 0 failures; QA suite 58, 0 failures. Fixed during inspection: Chromium warning from the iframe sandbox (removed, it added no isolation), demo vehicle text claiming in-game confirmation (patched by script), mobile hero stat cards covering the phone, lazy-image test flake.
+
 ## Publishing risks to decide (Gate E)
 1. **`demo/phone/` is NUI source code** of a private resource. Publishing it publishes that frontend. It is client-delivered code in any server using it, contains no secrets (scan passes), but it is a decision for the owner.
 2. Demo/screenshots show the model name "Bugatti Chiron" (third-party trademark, incidental). Consider a generic demo vehicle.
