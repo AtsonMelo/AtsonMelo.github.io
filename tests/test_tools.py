@@ -32,7 +32,7 @@ def seed():
         ],
         "roles": roles,
         "guild": {"id": GUILD, "name": "DevLab", "verification_level": 0, "approximate_member_count": 2, "features": [], "roles": roles},
-        "log": [], "next": 1000, "throttled": False,
+        "log": [], "next": 1000, "throttled": False, "messages": {}, "invites": [], "allow_guild": False,
     }
 
 state = seed()
@@ -54,6 +54,12 @@ class Fake(http.server.BaseHTTPRequestHandler):
         if path.endswith("/threads/active"): return self._send(200, {"threads": []})
         if path.endswith("/users/@me/guilds"): return self._send(200, [{"id": GUILD, "name": "DevLab", "permissions": str(EVERYONE | BOT)}])
         if path.endswith("/users/@me"): return self._send(200, {"id": "42", "username": "DevLab Automation", "bot": True})
+        if "/messages" in path and "/channels/" in path:
+            cid = path.split("/channels/")[1].split("/")[0]
+            return self._send(200, state["messages"].get(cid, [])[:1])
+        if path.endswith("/invites"):
+            if not state.get("allow_guild"): return self._send(403, {"message": "Missing Permissions"})
+            return self._send(200, state.get("invites") or [])
         if path.endswith("/guilds/" + GUILD): return self._send(200, state["guild"])
         self._send(404, {"message": "not found"})
     def do_POST(self):
@@ -67,10 +73,25 @@ class Fake(http.server.BaseHTTPRequestHandler):
                   "topic": body.get("topic") or "", "permission_overwrites": body.get("permission_overwrites") or [], "position": 0}
             state["channels"].append(ch); return self._send(201, ch)
         if path.endswith("/invites"): return self._send(200, {"code": "AbCd123"})
+        if "/messages" in path and "/channels/" in path:
+            cid = path.split("/channels/")[1].split("/")[0]
+            state["messages"].setdefault(cid, []).append({"id": "m" + str(len(state["messages"].get(cid, []))), "content": body.get("content", "")})
+            return self._send(200, {"id": "m"})
         self._send(200, {"id": "m"})
     def do_PATCH(self):
-        body = self._body(); cid = self.path.split("?")[0].rstrip("/").split("/")[-1]
-        state["log"].append(("PATCH", self.path, body, self.headers.get("Authorization")))
+        body = self._body(); path = self.path.split("?")[0]
+        state["log"].append(("PATCH", path, body, self.headers.get("Authorization")))
+        if "/roles/" in path:
+            rid = path.rstrip("/").split("/")[-1]
+            for role in state["roles"]:
+                if role["id"] == rid:
+                    if "permissions" in body: role["permissions"] = str(body["permissions"])
+                    return self._send(200, role)
+            return self._send(404, {})
+        if path.rstrip("/") == "/guilds/" + GUILD:
+            if not state.get("allow_guild"): return self._send(403, {"message": "Missing Permissions"})
+            state["guild"].update(body); return self._send(200, state["guild"])
+        cid = path.rstrip("/").split("/")[-1]
         for ch in state["channels"]:
             if ch["id"] == cid:
                 ch.update(body); return self._send(200, ch)
@@ -133,7 +154,8 @@ staff = next(body for body in text_posts if body["name"] == "dev-interno")
 check("staff channel denies @everyone view at creation", int(staff["permission_overwrites"][0]["deny"]) & VIEW and staff["permission_overwrites"][0]["id"] == GUILD)
 check("bot keeps view on the staff channel", int(staff["permission_overwrites"][1]["allow"]) & VIEW and staff["permission_overwrites"][1]["id"] == BOTROLE)
 welcome = next(body for body in text_posts if body["name"] == "boas-vindas")
-check("welcome channel is readable but not writable by @everyone", int(welcome["permission_overwrites"][0]["allow"]) & VIEW and int(welcome["permission_overwrites"][0]["deny"]) & SEND)
+check("welcome channel is readable but not writable by @everyone", int(welcome["permission_overwrites"][0]["allow"]) & VIEW and int(welcome["permission_overwrites"][0]["deny"]) & SEND and int(welcome["permission_overwrites"][0]["deny"]) & (1 << 38))
+check("same-run post does not read history first", not [item for item in state["log"] if item[0] == "GET" and "/messages" in item[1]])
 MENTION, INVITE = 1 << 17, 1 << 0
 public_text = [body for body in text_posts if body["name"] != "dev-interno"]
 check("public channels deny @everyone mentions and invites", public_text and all(int(body["permission_overwrites"][0]["deny"]) & MENTION and int(body["permission_overwrites"][0]["deny"]) & INVITE for body in public_text))
@@ -180,6 +202,58 @@ bad_manifest.write_text(json.dumps({"guild_id": GUILD, "preimage": pre, "created
 state["log"].clear()
 r = run("--rollback", str(bad_manifest), "--yes")
 check("rollback refuses a manifest that targets a pre-existing channel", r.returncode != 0 and "DELETE" not in methods() and any(c["id"] == "3" for c in state["channels"]), r.stdout + r.stderr)
+
+state["log"].clear()
+r = run("--guild", GUILD, "--yes", "--tighten-public")
+channel_patches = [item for item in state["log"] if item[0] == "PATCH" and "/channels/" in item[1]]
+role_patches = [item for item in state["log"] if item[0] == "PATCH" and "/roles/" in item[1]]
+patched = {next(c["name"] for c in state["channels"] if c["id"] == item[1].rstrip("/").split("/")[-1]) for item in channel_patches}
+check("tighten only the legacy public containers", r.returncode == 0 and patched == {"geral", "Geral", "Canais de Texto", "Canais de Voz"}, r.stdout + r.stderr + str(patched))
+check("tighten denies mention and invite without hiding the channel", channel_patches and all(
+    int(item[2]["permission_overwrites"][0]["deny"]) & MENTION and int(item[2]["permission_overwrites"][0]["deny"]) & INVITE and not (int(item[2]["permission_overwrites"][0]["deny"]) & VIEW)
+    and int(item[2]["permission_overwrites"][1]["allow"]) & VIEW for item in channel_patches))
+everyone_role = next(role for role in state["roles"] if role["id"] == GUILD)
+check("everyone role lost mention and invite but can still talk", role_patches and not (int(everyone_role["permissions"]) & MENTION) and not (int(everyone_role["permissions"]) & INVITE) and int(everyone_role["permissions"]) & SEND)
+tighten_manifest = re.search(r"BACKUP (\S+?-run\.json)", r.stdout).group(1)
+state["log"].clear()
+r = run("--guild", GUILD, "--yes", "--tighten-public")
+check("second tighten writes nothing", r.returncode == 0 and "PATCH" not in methods() and "ROLE-UNCHANGED @everyone" in r.stdout, r.stdout + r.stderr)
+state["log"].clear()
+r = run("--rollback", tighten_manifest, "--yes")
+everyone_role = next(role for role in state["roles"] if role["id"] == GUILD)
+geral = next(c for c in state["channels"] if c["name"] == "geral")
+check("tighten rollback restores the role and the legacy overwrites", r.returncode == 0 and int(everyone_role["permissions"]) == EVERYONE and geral["permission_overwrites"] == [], r.stdout + r.stderr)
+state["log"].clear()
+r = run("--guild", GUILD, "--yes", "--create-missing", "--apply-permissions")
+check("channels can be recreated after rollback", r.returncode == 0 and any(c["name"] == "boas-vindas" for c in state["channels"]), r.stdout + r.stderr)
+welcome_live = next(c for c in state["channels"] if c["name"] == "boas-vindas")
+welcome_live["permission_overwrites"][0]["deny"] = str(int(welcome_live["permission_overwrites"][0]["deny"]) & ~(1 << 38))
+state["log"].clear()
+r = run("--guild", GUILD, "--yes", "--tighten-public")
+retightened = [item for item in state["log"] if item[0] == "PATCH" and "/channels/" in item[1]]
+retightened_names = {next(c["name"] for c in state["channels"] if c["id"] == item[1].rstrip("/").split("/")[-1]) for item in retightened}
+check("tighten refreshes a read-only channel that lost the thread deny", "boas-vindas" in retightened_names and "dev-interno" not in retightened_names and "github-updates" not in retightened_names, str(retightened_names))
+welcome_live = next(c for c in state["channels"] if c["name"] == "boas-vindas")
+check("read-only thread deny is restored", int(welcome_live["permission_overwrites"][0]["deny"]) & (1 << 38))
+state["log"].clear()
+r = run("--guild", GUILD, "--yes", "--post-messages")
+posts = [item for item in state["log"] if item[0] == "POST" and "/messages" in item[1]]
+by_id = {c["id"]: c["name"] for c in state["channels"]}
+posted_in = {by_id[item[1].split("/")[2]] for item in posts}
+check("post-only fills every empty blueprint channel", r.returncode == 0 and posted_in == {"boas-vindas", "portfolio", "novidades", "solicitar-orcamento", "suporte", "dev-interno"}, r.stdout + str(posted_in))
+state["log"].clear()
+r = run("--guild", GUILD, "--yes", "--post-messages")
+check("second post skips channels that already have a message", r.returncode == 0 and "POST-SKIP #boas-vindas" in r.stdout and "POST-SKIP #dev-interno" in r.stdout and not [item for item in state["log"] if item[0] == "POST" and "/messages" in item[1]], r.stdout + r.stderr)
+state["log"].clear()
+r = run("--guild", GUILD, "--yes", "--review-guild")
+check("review guild reports the missing Manage Guild permission", r.returncode == 0 and "GUILD-SKIP verification" in r.stdout and "GUILD-SKIP invites" in r.stdout and state["guild"]["verification_level"] == 0, r.stdout + r.stderr)
+state["allow_guild"] = True
+state["guild"]["verification_level"] = 0
+state["invites"] = [{"code": "OldInvite1", "channel": {"id": "3"}, "max_age": 0, "max_uses": 0, "uses": 1}]
+state["log"].clear()
+r = run("--guild", GUILD, "--yes", "--review-guild")
+check("review guild raises verification and revokes a listed invite without printing the code", r.returncode == 0 and state["guild"]["verification_level"] == 1 and "INVITES listed=1 revoked=1" in r.stdout and "OldInvite1" not in r.stdout and any(item[0] == "DELETE" and item[1].endswith("/invites/OldInvite1") for item in state["log"]), r.stdout + r.stderr)
+state["allow_guild"] = False
 
 # ---------- set-contact ----------
 spec = importlib.util.spec_from_file_location("sc", ROOT / "tools" / "set-contact.py"); sc = importlib.util.module_from_spec(spec); spec.loader.exec_module(sc)

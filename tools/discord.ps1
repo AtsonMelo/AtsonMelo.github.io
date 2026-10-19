@@ -4,6 +4,8 @@
 #   pwsh -File tools/discord.ps1 -Action verify
 #   pwsh -File tools/discord.ps1 -Action apply -Approve CreateChannels
 #   pwsh -File tools/discord.ps1 -Action apply -Approve LockInternal
+#   pwsh -File tools/discord.ps1 -Action apply -Approve TightenPublic
+#   pwsh -File tools/discord.ps1 -Action apply -Approve ReviewGuild
 #   pwsh -File tools/discord.ps1 -Action apply -Approve PostMessages
 #   pwsh -File tools/discord.ps1 -Action apply -Approve CreateInvite
 #   pwsh -File tools/discord.ps1 -Action rollback -RollbackManifest <path> -Approve Rollback
@@ -12,7 +14,7 @@ param(
     [ValidateSet('diagnose', 'diff', 'verify', 'apply', 'rollback')]
     [string]$Action = 'diagnose',
     [string]$Guild = '',
-    [ValidateSet('CreateChannels', 'LockInternal', 'PostMessages', 'CreateInvite', 'Rollback')]
+    [ValidateSet('CreateChannels', 'LockInternal', 'TightenPublic', 'ReviewGuild', 'PostMessages', 'CreateInvite', 'Rollback')]
     [string[]]$Approve = @(),
     [string]$RollbackManifest = ''
 )
@@ -27,13 +29,13 @@ $allowed = @{
     diagnose = @()
     diff     = @()
     verify   = @()
-    apply    = @('CreateChannels', 'LockInternal', 'PostMessages', 'CreateInvite')
+    apply    = @('CreateChannels', 'LockInternal', 'TightenPublic', 'ReviewGuild', 'PostMessages', 'CreateInvite')
     rollback = @('Rollback')
 }
 foreach ($item in $Approve) {
     if ($allowed[$Action] -notcontains $item) { throw "-Approve $item is not valid for $Action" }
 }
-if ($Action -eq 'apply' -and -not $Approve) { throw 'apply requires -Approve with one or more of: CreateChannels, LockInternal, PostMessages, CreateInvite' }
+if ($Action -eq 'apply' -and -not $Approve) { throw 'apply requires -Approve with one or more of: CreateChannels, LockInternal, TightenPublic, ReviewGuild, PostMessages, CreateInvite' }
 if ($Action -eq 'rollback' -and -not $RollbackManifest) { throw 'rollback requires -RollbackManifest' }
 
 $script:BotExit = 1
@@ -84,6 +86,8 @@ switch ($Action) {
         $py = @('--guild', $Guild, '--yes')
         if ($Approve -contains 'CreateChannels') { $py += @('--create-missing', '--apply-permissions') }
         if ($Approve -contains 'LockInternal') { $py += '--lock-internal' }
+        if ($Approve -contains 'TightenPublic') { $py += '--tighten-public' }
+        if ($Approve -contains 'ReviewGuild') { $py += '--review-guild' }
         if ($Approve -contains 'PostMessages') { $py += '--post-messages' }
         if ($Approve -contains 'CreateInvite') { $py += '--create-invite' }
     }

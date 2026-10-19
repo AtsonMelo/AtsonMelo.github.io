@@ -1,21 +1,21 @@
 # DevLab Discord
 
-Applied on 2026-10-19, bot `DevLab Automation` (not Administrator). `LockInternal` and `CreateChannels` ran. No channel was renamed or moved. No welcome text was posted. No invite was created. Verification level is still **None**. Backups are under `%LOCALAPPDATA%\DevLab\discord-backups\`, not in this repo.
+Applied on 2026-10-19, bot `DevLab Automation` (not Administrator). `LockInternal`, `CreateChannels`, `TightenPublic`, and `PostMessages` ran. No channel was renamed, moved, or deleted. No invite was created. Verification level is still **None** (the bot lacks Manage Guild). Backups are under `%LOCALAPPDATA%\DevLab\discord-backups\`, not in this repo.
 
 ## What is there now
 
 | Where | Channel | @everyone can view | Notes |
 |---|---|---|---|
-| Canais de Texto | `#geral` | yes | Untouched. Still allows mentions and invites. |
+| Canais de Texto | `#geral` | yes, can send | Mentions and invites denied. The old bot message is still there. |
 | Canais de Texto | `#estrada-smart` | no | Locked in place. Empty. |
 | Canais de Texto | `#github-updates` | no | Locked in place. Empty. Do not attach a webhook until this stays denied. |
-| DEVLAB \| INÍCIO | `#boas-vindas` `#portfolio` `#novidades` | yes, cannot send | No messages yet. |
-| DEVLAB \| COMERCIAL | `#solicitar-orcamento` | yes, private threads only | No messages yet. Test with a non-owner account before any public invite. |
-| DEVLAB \| COMERCIAL | `#suporte` | yes, can send | Mentions and invites denied. No messages yet. |
-| DEVLAB \| EQUIPE — PRIVADO | `#dev-interno` | no | Born private. No messages yet. |
-| Canais de Voz | `Geral` | yes (connect/speak) | Untouched. |
+| DEVLAB \| INÍCIO | `#boas-vindas` `#portfolio` `#novidades` | yes, cannot send or write in threads | Prepared text posted once. |
+| DEVLAB \| COMERCIAL | `#solicitar-orcamento` | yes, private threads only | Instructions posted. A second account has not opened a thread yet. |
+| DEVLAB \| COMERCIAL | `#suporte` | yes, can send | Mentions and invites denied. Guidance posted. |
+| DEVLAB \| EQUIPE — PRIVADO | `#dev-interno` | no | Staff rules posted. Not visible to @everyone. |
+| Canais de Voz | `Geral` | yes (connect/speak) | Mentions and invites denied. |
 
-There is no staff role. The owner sees every channel because Discord does not apply overwrites to the owner. The bot role is allowed to view the locked channels. `@everyone` still has Create Invite and Mention Everyone on the role itself; the new public channels deny both. `#geral` and the voice channel do not.
+There is no staff role. The owner sees every channel because Discord does not apply overwrites to the owner. The bot role can view the locked channels and can still send the prepared text. `@everyone` no longer has Create Invite or Mention Everyone on the role. The same two bits are denied again on `#geral`, the voice channel, the public categories, and the presentation channels. A later channel created by hand can still be synced from its category, which now denies both bits.
 
 ## Target
 
@@ -23,13 +23,13 @@ New categories and channels are created only where something is missing. Existin
 
 | Category | Channel | Action | @everyone after an approved apply |
 |---|---|---|---|
-| DEVLAB \| INÍCIO | `#boas-vindas` `#portfolio` `#novidades` | create | read, react, no send |
+| DEVLAB \| INÍCIO | `#boas-vindas` `#portfolio` `#novidades` | create | read, react, no send, no thread send |
 | DEVLAB \| COMERCIAL | `#solicitar-orcamento` | create | read, create **private** threads, write in threads, no channel messages, no public threads |
 | DEVLAB \| COMERCIAL | `#suporte` | create | read and write, no @everyone mention, no private threads |
-| (stays) | `#geral` | reuse | unchanged until a separate approval |
+| (stays) | `#geral` | reuse, then tighten | read and write, no mention, no invite |
 | DEVLAB \| EQUIPE — PRIVADO | `#github-updates` `#estrada-smart` | reuse, then lock in place | view denied |
 | DEVLAB \| EQUIPE — PRIVADO | `#dev-interno` | create already locked | view denied |
-| Canais de Voz | `Geral` | keep | unchanged |
+| Canais de Voz | `Geral` | keep, then tighten | connect and speak, no mention, no invite |
 
 Denying view for `@everyone` also denies it for the bot unless the same request allows the bot role. The tool sends both overwrites together and refuses to hide a channel from itself. It will not replace overwrites that mention some other user or role.
 
@@ -57,13 +57,15 @@ These write to Discord only when `-Approve` names the scope:
 ```
 pwsh -File tools/discord.ps1 -Action apply -Approve LockInternal
 pwsh -File tools/discord.ps1 -Action apply -Approve CreateChannels
+pwsh -File tools/discord.ps1 -Action apply -Approve TightenPublic
+pwsh -File tools/discord.ps1 -Action apply -Approve ReviewGuild
 pwsh -File tools/discord.ps1 -Action apply -Approve PostMessages
 pwsh -File tools/discord.ps1 -Action apply -Approve CreateInvite
 ```
 
-`LockInternal` is the privacy gate: it denies `@everyone` view on `#github-updates` and `#estrada-smart` where they already are. `CreateChannels` creates only missing categories and channels and puts their overwrites on the create, so a staff channel is never born public. `PostMessages` posts the files in `messages/` only into channels that same run created. `CreateInvite` makes one permanent, unlimited invite to `#boas-vindas` and refuses while any internal channel is still visible.
+`LockInternal` denies `@everyone` view on the internal channels where they already are. `CreateChannels` creates only missing categories and channels and puts their overwrites on the create. `TightenPublic` denies mentions and invites on `#geral`, the voice channel, the public categories, and refreshes the read-only channels. It also removes those two bits from the `@everyone` role when the bot is allowed to. `ReviewGuild` tries to set verification to Low and to list invites; without Manage Guild it logs `GUILD-SKIP` and changes nothing. `PostMessages` posts each `messages/` file once: into channels created in that same run, or, when the run creates nothing, into an existing empty channel. A second run skips channels that already have a message. `CreateInvite` makes one permanent invite to `#boas-vindas` and refuses while any internal channel is visible. Do not run it until two ordinary accounts have proved a private thread.
 
-Do this in that order: lock, create, post, prove a private thread with a second account, then invite. Rollback: `docs/discord/ROLLBACK.md`.
+Rollback: `docs/discord/ROLLBACK.md`.
 
 ## Site
 

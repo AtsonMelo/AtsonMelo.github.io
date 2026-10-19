@@ -9,6 +9,8 @@ environment afterwards. Do not pass the token as an argument.
   python tools/discord_apply.py --guild <id> --verify                 # exit 1 when a public invite would be unsafe
   python tools/discord_apply.py --guild <id> --yes --create-missing --apply-permissions
   python tools/discord_apply.py --guild <id> --yes --lock-internal
+  python tools/discord_apply.py --guild <id> --yes --tighten-public
+  python tools/discord_apply.py --guild <id> --yes --review-guild
   python tools/discord_apply.py --guild <id> --yes --post-messages
   python tools/discord_apply.py --guild <id> --yes --create-invite
   python tools/discord_apply.py --rollback <manifest.json>            # plan
@@ -146,11 +148,40 @@ def can(channel, roles, guild_id, name):
     return bool(channel_everyone_bits(channel, roles, guild_id) & PERMS[name])
 
 
+WATCH = (
+    "VIEW_CHANNEL", "SEND_MESSAGES", "READ_MESSAGE_HISTORY", "MENTION_EVERYONE", "CREATE_INSTANT_INVITE",
+    "CREATE_PUBLIC_THREADS", "CREATE_PRIVATE_THREADS", "SEND_MESSAGES_IN_THREADS", "CONNECT", "SPEAK",
+)
+
+
+def effective_bits(channel, roles, guild_id, extra_roles):
+    value = everyone_bits(roles, guild_id)
+    for role in extra_roles:
+        value |= int(role["permissions"])
+    if value & PERMS["ADMINISTRATOR"]:
+        return (1 << 50) - 1
+    overwrites = channel.get("permission_overwrites") or []
+    everyone = next((row for row in overwrites if row.get("type") == 0 and row.get("id") == guild_id), None)
+    if everyone:
+        value = (value & ~int(everyone.get("deny") or 0)) | int(everyone.get("allow") or 0)
+    for role in extra_roles:
+        row = next((item for item in overwrites if item.get("type") == 0 and item.get("id") == role["id"]), None)
+        if row:
+            value = (value & ~int(row.get("deny") or 0)) | int(row.get("allow") or 0)
+    return value
+
+
+def watch_flags(value):
+    names = [name for name in WATCH if value & PERMS[name]]
+    return ",".join(names) if names else "-"
+
+
 def build_overwrites(guild_id, role_id, profile, held_bits):
     allow = bit_sum(profile["everyone_allow"])
     deny = bit_sum(profile["everyone_deny"])
     bot_allow = bit_sum(profile["bot_allow"])
-    missing = [name for name, bit in PERMS.items() if (allow | deny | bot_allow) & bit and not (held_bits & bit or held_bits & PERMS["ADMINISTRATOR"])]
+    granted = allow | bot_allow
+    missing = [name for name, bit in PERMS.items() if granted & bit and not (held_bits & bit or held_bits & PERMS["ADMINISTRATOR"])]
     if missing:
         raise ApiError("bot cannot set permission bits it does not hold: " + ", ".join(missing))
     if profile["everyone_deny"] and "VIEW_CHANNEL" in profile["everyone_deny"] and not (bot_allow & PERMS["VIEW_CHANNEL"]):
@@ -282,6 +313,10 @@ def render(state, blueprint, token):
         if channel["type"] == 0:
             extra = f" everyone_view={'yes' if can(channel, state['roles'], guild_id, 'VIEW_CHANNEL') else 'no'} everyone_send={'yes' if can(channel, state['roles'], guild_id, 'SEND_MESSAGES') else 'no'}"
         log_line(token, f"  {kind} #{channel['name']} parent={parent['name'] if parent else '-'}{extra}")
+        if channel["type"] in (0, 2, 4):
+            everyone = effective_bits(channel, state["roles"], guild_id, [])
+            bot = effective_bits(channel, state["roles"], guild_id, [role])
+            log_line(token, f"  AUDIT {kind} #{channel['name']} everyone={watch_flags(everyone)} bot={watch_flags(bot)}")
     if state["threads"]:
         log_line(token, f"THREADS active={len(state['threads'])}")
     else:
@@ -379,8 +414,19 @@ def post_messages(discord, state, blueprint, token, created_ids):
     ids = {channel["name"]: channel["id"] for channel in state["channels"] if channel["type"] == 0}
     posted = []
     for _, channel in iter_channels(blueprint):
-        if channel["name"] not in created_ids or not channel.get("message"):
+        if not channel.get("message"):
             continue
+        if created_ids:
+            if channel["name"] not in created_ids:
+                continue
+        else:
+            if channel["name"] not in ids:
+                log_line(token, f"POST-SKIP #{channel['name']} missing")
+                continue
+            existing = discord.call("GET", f"/channels/{ids[channel['name']]}/messages?limit=1")
+            if existing:
+                log_line(token, f"POST-SKIP #{channel['name']}")
+                continue
         text = (BP_DIR / channel["message"]).read_text(encoding="utf-8")
         text = re.sub(r"<#([a-z0-9-]+)>", lambda match: f"<#{ids[match.group(1)]}>" if match.group(1) in ids else match.group(0), text)
         for part in chunks(text):
@@ -428,6 +474,152 @@ def lock_internal(discord, state, blueprint, token, manifest, manifest_path):
             remember(manifest_path, manifest)
         log_line(token, f"LOCK #{channel['name']} {channel['id']}")
     return manifest["locked_channel_ids"]
+
+
+def tighten_targets(state, blueprint):
+    chosen = {}
+
+    def add(channel, profile_name):
+        if channel and channel["id"] not in chosen:
+            chosen[channel["id"]] = (channel, profile_name)
+
+    for item in blueprint.get("preserve", []):
+        add(find(state["channels"], item["name"], item["type"]), "legacy_community")
+    add(find(state["channels"], "geral", 0), "legacy_community")
+    for category in blueprint["categories"]:
+        if category.get("private"):
+            continue
+        add(find(state["channels"], category["name"], 4), "legacy_community")
+        for channel in category["channels"]:
+            if channel.get("access") == "read_only":
+                add(find(state["channels"], channel["name"], 0), "read_only")
+    return list(chosen.values())
+
+
+def write_overwrite(discord, channel, wanted, token, manifest, manifest_path):
+    if same_overwrites(channel.get("permission_overwrites"), wanted):
+        log_line(token, f"TIGHTEN-UNCHANGED #{channel['name']}")
+        return True
+    try:
+        updated = discord.call("PATCH", f"/channels/{channel['id']}", {"permission_overwrites": wanted})
+    except ApiError as error:
+        if "HTTP 403" not in str(error):
+            raise
+        log_line(token, f"TIGHTEN-SKIP #{channel['name']} {channel['id']}")
+        return False
+    channel["permission_overwrites"] = updated.get("permission_overwrites", wanted)
+    if channel["id"] not in manifest["locked_channel_ids"]:
+        manifest["locked_channel_ids"].append(channel["id"])
+        remember(manifest_path, manifest)
+    log_line(token, f"TIGHTEN #{channel['name']} {channel['id']}")
+    return True
+
+
+def tighten_public(discord, state, blueprint, token, manifest, manifest_path):
+    guild_id = state["guild"]["id"]
+    held = bot_bits(state["roles"], guild_id)
+    role_id = bot_role(state["roles"])["id"]
+    targets = [(channel, profile_name) for channel, profile_name in tighten_targets(state, blueprint) if channel]
+    for channel, _profile_name in targets:
+        foreign = [row for row in channel.get("permission_overwrites") or [] if row["id"] not in {guild_id, role_id}]
+        if foreign:
+            raise ApiError(f"refusing to replace foreign overwrites on #{channel['name']}")
+    leaves, categories = [], []
+    for channel, profile_name in targets:
+        wanted = build_overwrites(guild_id, role_id, blueprint["access_profiles"][profile_name], held)
+        (categories if channel["type"] == 4 else leaves).append((channel, wanted))
+    by_id = {channel["id"]: channel for channel in state["channels"]}
+    role = bot_role(state["roles"])
+    relax = []
+    for channel, wanted in leaves:
+        if channel.get("permission_overwrites") or same_overwrites(channel.get("permission_overwrites"), wanted):
+            continue
+        parent = by_id.get(channel.get("parent_id") or "")
+        if not parent:
+            continue
+        needed = 0
+        for row in wanted:
+            needed |= int(row.get("allow") or 0) | int(row.get("deny") or 0)
+        if needed & ~effective_bits(parent, state["roles"], guild_id, [role]):
+            relax.append(parent)
+    seen = set()
+    try:
+        for parent in relax:
+            if parent["id"] in seen or not parent.get("permission_overwrites"):
+                continue
+            seen.add(parent["id"])
+            updated = discord.call("PATCH", f"/channels/{parent['id']}", {"permission_overwrites": []})
+            parent["permission_overwrites"] = updated.get("permission_overwrites") or []
+            log_line(token, f"TIGHTEN-RELAX #{parent['name']} {parent['id']}")
+        for channel, wanted in leaves:
+            write_overwrite(discord, channel, wanted, token, manifest, manifest_path)
+    finally:
+        for channel, wanted in categories:
+            write_overwrite(discord, channel, wanted, token, manifest, manifest_path)
+    everyone = next(role for role in state["roles"] if role["id"] == guild_id)
+    before = int(everyone["permissions"])
+    drop = PERMS["MENTION_EVERYONE"] | PERMS["CREATE_INSTANT_INVITE"]
+    after = before & ~drop
+    if after == before:
+        log_line(token, "ROLE-UNCHANGED @everyone")
+        return
+    try:
+        updated = discord.call("PATCH", f"/guilds/{guild_id}/roles/{guild_id}", {"permissions": str(after)})
+    except ApiError as error:
+        if "HTTP 403" not in str(error):
+            raise
+        log_line(token, "ROLE-SKIP @everyone (cannot edit the role with current bot permissions)")
+        return
+    new_value = str(updated.get("permissions", after))
+    everyone["permissions"] = new_value
+    for role in state["guild"].get("roles") or []:
+        if role["id"] == guild_id:
+            role["permissions"] = new_value
+    manifest["everyone_permissions_before"] = str(before)
+    remember(manifest_path, manifest)
+    log_line(token, "ROLE-TIGHTEN @everyone removed mention and invite")
+
+
+def review_guild(discord, state, token, manifest, manifest_path):
+    guild_id = state["guild"]["id"]
+    level = int(state["guild"].get("verification_level") or 0)
+    if level >= 1:
+        log_line(token, f"GUILD-UNCHANGED verification={level}")
+    else:
+        try:
+            updated = discord.call("PATCH", f"/guilds/{guild_id}", {"verification_level": 1})
+        except ApiError as error:
+            if "HTTP 403" not in str(error):
+                raise
+            log_line(token, "GUILD-SKIP verification (Manage Guild required)")
+        else:
+            state["guild"]["verification_level"] = updated.get("verification_level", 1)
+            manifest["verification_level_before"] = level
+            remember(manifest_path, manifest)
+            log_line(token, "GUILD verification=1")
+    try:
+        invites = discord.call("GET", f"/guilds/{guild_id}/invites")
+    except ApiError as error:
+        if "HTTP 403" not in str(error):
+            raise
+        log_line(token, "GUILD-SKIP invites (Manage Guild required)")
+        return
+    revoked = 0
+    for invite in invites or []:
+        code = str(invite.get("code") or "")
+        if not re.fullmatch(r"[A-Za-z0-9]+", code):
+            raise ApiError("invite list returned an unexpected code; refusing to delete")
+        manifest.setdefault("revoked_invites", []).append({
+            "code": code,
+            "channel_id": (invite.get("channel") or {}).get("id"),
+            "max_age": invite.get("max_age"),
+            "max_uses": invite.get("max_uses"),
+            "uses": invite.get("uses"),
+        })
+        remember(manifest_path, manifest)
+        discord.call("DELETE", f"/invites/{code}")
+        revoked += 1
+    log_line(token, f"INVITES listed={len(invites or [])} revoked={revoked}")
 
 
 def create_invite(discord, state, blueprint, token):
@@ -487,6 +679,16 @@ def rollback(discord, manifest_path, token, apply):
         log_line(token, f"ROLLBACK-RESTORE #{live[channel_id]['name']} {channel_id}")
         if apply:
             discord.call("PATCH", f"/channels/{channel_id}", {"permission_overwrites": old.get("permission_overwrites") or []})
+    before = manifest.get("everyone_permissions_before")
+    if before is not None:
+        log_line(token, "ROLLBACK-ROLE @everyone")
+        if apply:
+            try:
+                discord.call("PATCH", f"/guilds/{manifest['guild_id']}/roles/{manifest['guild_id']}", {"permissions": str(before)})
+            except ApiError as error:
+                if "HTTP 403" not in str(error):
+                    raise
+                log_line(token, "ROLLBACK-ROLE-SKIP @everyone")
     for code in manifest.get("invite_codes") or []:
         log_line(token, f"ROLLBACK-INVITE {code}")
         if apply:
@@ -515,12 +717,14 @@ def main(argv=None):
     parser.add_argument("--post-messages", action="store_true")
     parser.add_argument("--create-invite", action="store_true")
     parser.add_argument("--lock-internal", action="store_true")
+    parser.add_argument("--tighten-public", action="store_true")
+    parser.add_argument("--review-guild", action="store_true")
     parser.add_argument("--verify", action="store_true")
     parser.add_argument("--rollback", default="")
     args = parser.parse_args(argv)
-    mutations = [args.create_missing, args.post_messages, args.create_invite, args.lock_internal]
+    mutations = [args.create_missing, args.post_messages, args.create_invite, args.lock_internal, args.tighten_public, args.review_guild]
     if args.yes and not any(mutations) and not args.rollback:
-        raise ApiError("--yes does nothing by itself. Pass --create-missing, --lock-internal, --post-messages, or --create-invite.")
+        raise ApiError("--yes does nothing by itself. Pass --create-missing, --lock-internal, --tighten-public, --review-guild, --post-messages, or --create-invite.")
     if any(mutations) and not args.yes:
         raise ApiError("mutation flags require --yes")
     if args.rollback and any(mutations):
@@ -551,6 +755,10 @@ def main(argv=None):
             create_missing(discord, state, blueprint, token, args.apply_permissions, manifest, man_path)
         if args.lock_internal:
             lock_internal(discord, state, blueprint, token, manifest, man_path)
+        if args.tighten_public:
+            tighten_public(discord, state, blueprint, token, manifest, man_path)
+        if args.review_guild:
+            review_guild(discord, state, token, manifest, man_path)
         if args.post_messages:
             post_messages(discord, state, blueprint, token, {item["name"] for item in manifest["created_channels"] if item["type"] == 0})
         if args.create_invite:
