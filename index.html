@@ -1,0 +1,315 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>DEVLAB — Atson Melo | FiveM Developer</title>
+  <meta name="description" content="Atson Melo — FiveM developer. Custom Lua systems, modern NUI interfaces, frontend/Lua integration, automated tests and open source contributions.">
+  <meta name="theme-color" content="#0a0d12">
+  <link rel="canonical" href="https://atsonmelo.github.io/">
+  <link rel="icon" href="assets/img/favicon.svg" type="image/svg+xml">
+
+  <meta property="og:type" content="website">
+  <meta property="og:site_name" content="DEVLAB">
+  <meta property="og:title" content="DEVLAB — Atson Melo | FiveM Developer">
+  <meta property="og:description" content="Custom FiveM systems. Built with precision. Lua • JavaScript • Custom UI • Systems Integration.">
+  <meta property="og:url" content="https://atsonmelo.github.io/">
+  <meta property="og:image" content="https://atsonmelo.github.io/assets/img/og.png">
+  <meta property="og:image:width" content="1200">
+  <meta property="og:image:height" content="630">
+  <meta name="twitter:card" content="summary_large_image">
+
+  <link rel="stylesheet" href="assets/css/styles.css">
+  <script>document.documentElement.classList.add('js')</script>
+  <script type="application/ld+json">
+  {"@context":"https://schema.org","@type":"Person","name":"Atson Melo","jobTitle":"FiveM Developer","url":"https://atsonmelo.github.io/","sameAs":["https://github.com/AtsonMelo"],"knowsAbout":["FiveM","Lua","JavaScript","NUI","Qbox"]}
+  </script>
+</head>
+<body>
+<a class="skip" href="#main" data-i18n="nav.skip">Skip to content</a>
+
+<header class="site-header">
+  <div class="wrap bar">
+    <a class="brand" href="#top" aria-label="DEVLAB — Atson Melo"><span class="brand-mark" aria-hidden="true">&gt;_</span><span class="brand-name">DEVLAB</span></a>
+    <nav class="nav" id="nav" aria-label="Primary">
+      <a href="#projects" data-i18n="nav.projects">Projects</a>
+      <a href="#skills" data-i18n="nav.skills">Skills</a>
+      <a href="#process" data-i18n="nav.process">Process</a>
+      <a href="#contact" data-i18n="nav.contact">Contact</a>
+    </nav>
+    <div class="bar-actions">
+      <button class="lang" id="lang" type="button" aria-label="Language / Idioma" data-lang="en"><span data-l="en">EN</span><i aria-hidden="true">/</i><span data-l="pt">PT</span></button>
+      <button class="burger" id="burger" type="button" aria-label="Menu" aria-expanded="false" aria-controls="nav"><span></span><span></span></button>
+    </div>
+  </div>
+</header>
+
+<main id="main">
+<!-- ============ HERO ============ -->
+<section class="hero" id="top">
+  <div class="wrap hero-grid">
+    <div class="hero-copy">
+      <p class="eyebrow"><span class="dot" aria-hidden="true"></span><span data-i18n="hero.eyebrow">Atson Melo — FiveM Developer</span></p>
+      <h1><span data-i18n="hero.h1a">Custom FiveM systems.</span> <em data-i18n="hero.h1b">Built with precision.</em></h1>
+      <p class="lead" data-i18n="hero.lead">I build and fix FiveM resources: Lua server logic, modern NUI interfaces and the integration between them, backed by automated tests.</p>
+      <p class="stack" aria-label="Stack"><span>Lua</span><span>JavaScript</span><span>Custom UI</span><span>Systems Integration</span></p>
+      <div class="cta-row">
+        <a class="btn primary" href="#projects" data-i18n="hero.cta1">View projects</a>
+        <a class="btn" href="#contact" data-i18n="hero.cta2">Request development</a>
+        <a class="btn ghost" href="https://github.com/AtsonMelo" rel="noopener" data-github>GitHub<span class="ext" aria-hidden="true">↗</span></a>
+      </div>
+    </div>
+
+    <div class="hero-visual" aria-hidden="false">
+      <div class="glow" aria-hidden="true"></div>
+      <figure class="phone-frame">
+        <img src="assets/img/phone-home.webp" width="332" height="700" alt="DevLab Phone home screen: widgets, notifications and app dock, rendered in headless Chromium with a simulated FiveM bridge" data-i18n-alt="hero.phoneAlt" fetchpriority="high">
+      </figure>
+      <div class="float f1">
+        <span class="f-label" data-i18n="hero.f1l">Automated tests</span>
+        <strong>1,152 <small>passed · 0 failed</small></strong>
+        <span class="f-note" data-i18n="hero.f1n">offline &amp; simulated · run 2026-10-19</span>
+      </div>
+      <div class="float f2">
+        <span class="f-label" data-i18n="hero.f2l">Open source</span>
+        <strong>Qbox <small>PR #780</small></strong>
+        <span class="f-note" data-i18n="hero.f2n">open · awaiting review</span>
+      </div>
+    </div>
+  </div>
+  <p class="wrap shot-note" data-i18n="hero.shotNote">Screenshot: DevLab Phone NUI in headless Chromium with a simulated FiveM bridge — not an in-game capture. All figures and names are demo data.</p>
+</section>
+
+<!-- ============ PROOF STRIP ============ -->
+<section class="proof" aria-label="Evidence">
+  <div class="wrap proof-grid">
+    <div><strong>1,152</strong><span data-i18n="proof.tests">automated tests passing, 0 failing</span></div>
+    <div><strong>3</strong><span data-i18n="proof.res">own resources: phone, character, core</span></div>
+    <div><strong>1</strong><span data-i18n="proof.pr">open upstream PR in Qbox qbx_core</span></div>
+    <div><strong>FXServer</strong><span data-i18n="proof.boot">core resource booted on a real local FiveM server</span></div>
+  </div>
+</section>
+
+<!-- ============ PROJECTS ============ -->
+<section class="section" id="projects">
+  <div class="wrap">
+    <header class="section-head">
+      <p class="kicker" data-i18n="proj.kicker">Projects</p>
+      <h2 data-i18n="proj.title">Real work, with the real status.</h2>
+      <p class="sub" data-i18n="proj.sub">DEVLAB is a working lab. Each card says what is done, what is still in progress and how it was verified. Source is private; details are available on request.</p>
+    </header>
+
+    <div class="cards">
+      <!-- Phone -->
+      <article class="card card-wide">
+        <div class="card-media media-phones" aria-hidden="true">
+          <img src="assets/img/phone-bank.webp" width="332" height="700" alt="" loading="lazy">
+          <img src="assets/img/phone-messages.webp" width="332" height="700" alt="" loading="lazy">
+        </div>
+        <div class="card-body">
+          <div class="badges"><span class="badge ok" data-i18n="st.tested">Working · tested offline</span><span class="badge" data-i18n="st.nogame">Not yet verified in-game</span></div>
+          <h3>DevLab Phone</h3>
+          <p data-i18n="p.phone.desc">A custom in-game phone: NUI interface (HTML/CSS/JS) wired to Lua through a validated RPC pipeline. Home, garage, messages and a simulated bank with PIX flow.</p>
+          <ul class="tags"><li>Lua</li><li>JavaScript (ES modules)</li><li>HTML/CSS</li><li>NUI</li><li>Playwright</li></ul>
+          <button class="btn small" type="button" data-open="dlg-phone" data-i18n="card.details">View details</button>
+        </div>
+      </article>
+
+      <!-- Character -->
+      <article class="card">
+        <div class="card-media placeholder" role="img" aria-label="Media placeholder">
+          <span class="ph-tag" data-i18n="ph.tag">MEDIA PLACEHOLDER</span>
+          <span class="ph-txt" data-i18n="ph.char">In-game captures pending</span>
+        </div>
+        <div class="card-body">
+          <div class="badges"><span class="badge warn" data-i18n="st.dev">In development</span><span class="badge" data-i18n="st.tested2">Tested offline</span></div>
+          <h3>DevLab Character</h3>
+          <p data-i18n="p.char.desc">Character appearance system: validated presets, in-game calibration tools and per-player saved choices.</p>
+          <ul class="tags"><li>Lua</li><li>Presets</li><li>Per-player persistence</li></ul>
+          <button class="btn small" type="button" data-open="dlg-char" data-i18n="card.details">View details</button>
+        </div>
+      </article>
+
+      <!-- Core -->
+      <article class="card">
+        <div class="card-media term" aria-hidden="true">
+<pre><span class="t-dim">$ start local FXServer</span>
+<span class="t-ok">Started resource devlab_core</span>
+{"event":"started","version":"0.1.0"}
+<span class="t-dim">&gt; devlab_status</span>
+{"event":"status","accepted":0,"rejected":0}</pre>
+        </div>
+        <div class="card-body">
+          <div class="badges"><span class="badge ok" data-i18n="st.found">Foundation · booted on FXServer</span></div>
+          <h3>DevLab Core</h3>
+          <p data-i18n="p.core.desc">Shared infrastructure: input validation, rate limiting and structured JSON logging, covered by tests and booted on a local FiveM server.</p>
+          <ul class="tags"><li>Lua</li><li data-i18n="tag.arch">Architecture</li><li data-i18n="tag.tests">Tests</li></ul>
+          <button class="btn small" type="button" data-open="dlg-core" data-i18n="card.details">View details</button>
+        </div>
+      </article>
+
+      <!-- Qbox -->
+      <article class="card card-wide card-oss">
+        <div class="card-media oss" aria-hidden="true">
+          <div class="pr-chip"><span class="pr-dot"></span>Qbox-project / qbx_core</div>
+          <div class="pr-title">fix(lib): bound qbx.spawnVehicle waits and clean up on timeout</div>
+          <div class="pr-meta"><span>#780</span><span class="pr-state">Open</span><span class="plus">+16</span><span class="minus">−3</span><span>1 file</span></div>
+        </div>
+        <div class="card-body">
+          <div class="badges"><span class="badge info" data-i18n="st.open">Submitted · open, awaiting review</span></div>
+          <h3>Open Source — Qbox</h3>
+          <p data-i18n="p.oss.desc">Upstream fix for unbounded waits in <code>qbx.spawnVehicle</code>, with a reproduction harness. Linked, verifiable and still under maintainer review.</p>
+          <ul class="tags"><li>Lua</li><li>qbx_core</li><li>Pull request</li><li>Test harness</li></ul>
+          <div class="card-actions">
+            <a class="btn small primary" href="https://github.com/Qbox-project/qbx_core/pull/780" rel="noopener">PR #780<span class="ext" aria-hidden="true">↗</span></a>
+            <button class="btn small" type="button" data-open="dlg-oss" data-i18n="card.details">View details</button>
+          </div>
+        </div>
+      </article>
+    </div>
+  </div>
+</section>
+
+<!-- ============ SKILLS ============ -->
+<section class="section alt" id="skills">
+  <div class="wrap">
+    <header class="section-head">
+      <p class="kicker" data-i18n="sk.kicker">Specialties</p>
+      <h2 data-i18n="sk.title">What I work with.</h2>
+      <p class="sub" data-i18n="sk.sub">Listed by what the projects above actually use. No self-assigned percentages.</p>
+    </header>
+    <ul class="skills">
+      <li><b>Lua</b><span data-i18n="sk.lua">Server and client scripts, validation, state machines, cleanup on failure.</span></li>
+      <li><b>JavaScript</b><span data-i18n="sk.js">Dependency-free ES modules for NUI, safe DOM rendering.</span></li>
+      <li><b>HTML / CSS</b><span data-i18n="sk.css">Responsive, accessible interfaces; design tokens; keyboard support.</span></li>
+      <li><b>FiveM / Cfx.re</b><span data-i18n="sk.cfx">Resource manifests, NUI callbacks, FXServer runtime, Qbox ecosystem.</span></li>
+      <li><b>Git &amp; GitHub</b><span data-i18n="sk.git">Thematic commits, pull requests, review-friendly history.</span></li>
+      <li><b data-i18n="sk.testsT">Automated testing</b><span data-i18n="sk.tests">Lua suites, Node unit tests and headless Chromium end-to-end tests.</span></li>
+      <li><b data-i18n="sk.intT">Frontend ↔ backend integration</b><span data-i18n="sk.int">Versioned message contracts, idempotent requests, rate limits.</span></li>
+      <li><b data-i18n="sk.dbgT">Bug diagnosis &amp; fixes</b><span data-i18n="sk.dbg">Measure, prove the cause, apply the smallest change, test, validate.</span></li>
+    </ul>
+  </div>
+</section>
+
+<!-- ============ PROCESS ============ -->
+<section class="section" id="process">
+  <div class="wrap">
+    <header class="section-head">
+      <p class="kicker" data-i18n="pr.kicker">How I work</p>
+      <h2 data-i18n="pr.title">Clear scope. Tested delivery.</h2>
+    </header>
+    <ol class="steps">
+      <li><span class="n">01</span><h3 data-i18n="pr.s1">Understand</h3><p data-i18n="pr.s1d">We define the problem, your server setup (framework, versions) and what “done” means.</p></li>
+      <li><span class="n">02</span><h3 data-i18n="pr.s2">Proposal</h3><p data-i18n="pr.s2d">A written scope with deliverables and limits, so there are no surprises.</p></li>
+      <li><span class="n">03</span><h3 data-i18n="pr.s3">Development</h3><p data-i18n="pr.s3d">Versioned in Git, in small reviewable commits.</p></li>
+      <li><span class="n">04</span><h3 data-i18n="pr.s4">Testing</h3><p data-i18n="pr.s4d">Automated tests plus in-game checks, reported honestly, including what could not be verified.</p></li>
+      <li><span class="n">05</span><h3 data-i18n="pr.s5">Delivery</h3><p data-i18n="pr.s5d">Clean hand-over with documentation and install notes.</p></li>
+    </ol>
+  </div>
+</section>
+
+<!-- ============ CONTACT ============ -->
+<section class="section contact" id="contact">
+  <div class="wrap contact-box">
+    <div>
+      <p class="kicker" data-i18n="ct.kicker">Contact</p>
+      <h2 data-i18n="ct.title">Have a FiveM project in mind? Let’s build it.</h2>
+      <p class="sub" data-i18n="ct.sub">Custom resources, UI work, fixes and optimizations. Tell me what your server needs.</p>
+    </div>
+    <div class="channels">
+      <ul id="channels" class="channel-list"></ul>
+      <p id="channels-note" class="note" hidden data-i18n="ct.note">Direct channels are being set up. For now, GitHub is the best way to reach me.</p>
+    </div>
+  </div>
+</section>
+</main>
+
+<footer class="site-footer">
+  <div class="wrap foot">
+    <span>© <span id="year">2026</span> Atson Melo · DEVLAB</span>
+    <span data-i18n="ft.note">FiveM is a trademark of its respective owners. DEVLAB is an independent project.</span>
+  </div>
+</footer>
+
+<!-- ============ DETAIL DIALOGS ============ -->
+<dialog id="dlg-phone" aria-labelledby="dlg-phone-t">
+  <div class="dlg-head"><h3 id="dlg-phone-t">DevLab Phone</h3><button class="x" type="button" data-close aria-label="Close">×</button></div>
+  <div class="dlg-body">
+    <h4 data-i18n="d.done">Implemented</h4>
+    <ul>
+      <li data-i18n="p.phone.a1">HUD button, cursor mode, navigation stack and layered ESC handling.</li>
+      <li data-i18n="p.phone.a2">NUI ↔ Lua handshake with reconnect, and an RPC pipeline with idempotency and rate limiting.</li>
+      <li data-i18n="p.phone.a3">Apps: home widgets, garage (vehicle-call state machine), messages, DevBank and PIX flow.</li>
+      <li data-i18n="p.phone.a4">Banking and messages are simulations with demo data; no real value is moved.</li>
+      <li data-i18n="p.phone.a5">User text is rendered as plain text; HTML in messages stays literal (covered by a test).</li>
+    </ul>
+    <h4 data-i18n="d.tests">Verification</h4>
+    <ul>
+      <li data-i18n="p.phone.t1">617 Lua assertions, 5 Node unit tests, 112 headless Chromium end-to-end checks.</li>
+      <li data-i18n="p.phone.t2">Run on 2026-10-19, 0 failures. All with a simulated FiveM bridge.</li>
+    </ul>
+    <h4 data-i18n="d.next">Not done yet</h4>
+    <ul>
+      <li data-i18n="p.phone.n1">In-game verification on GTA V Enhanced (NUI focus, ESC vs. pause menu).</li>
+      <li data-i18n="p.phone.n2">Persistence, Qbox adapter and real player-to-player messaging.</li>
+    </ul>
+  </div>
+</dialog>
+
+<dialog id="dlg-char" aria-labelledby="dlg-char-t">
+  <div class="dlg-head"><h3 id="dlg-char-t">DevLab Character</h3><button class="x" type="button" data-close aria-label="Close">×</button></div>
+  <div class="dlg-body">
+    <h4 data-i18n="d.done">Implemented</h4>
+    <ul>
+      <li data-i18n="p.char.a1">Appearance presets (face, hair, beard, clothing slots) applied through the game’s ped component and overlay natives.</li>
+      <li data-i18n="p.char.a2">Every piece is validated against what the current game build actually has; missing ones are skipped and logged instead of guessed.</li>
+      <li data-i18n="p.char.a3">In-game calibration tools: step through pieces, keep the one you like; saved per player on the server and reused on the next apply.</li>
+      <li data-i18n="p.char.a4">Optional re-apply on join and respawn.</li>
+    </ul>
+    <h4 data-i18n="d.tests">Verification</h4>
+    <ul><li data-i18n="p.char.t1">389 offline Lua assertions, 0 failures (2026-10-19).</li></ul>
+    <h4 data-i18n="d.next">Not done yet</h4>
+    <ul><li data-i18n="p.char.n1">Nothing has been verified visually in GTA V Enhanced yet, so no screenshots are shown. The card uses a placeholder on purpose.</li></ul>
+  </div>
+</dialog>
+
+<dialog id="dlg-core" aria-labelledby="dlg-core-t">
+  <div class="dlg-head"><h3 id="dlg-core-t">DevLab Core</h3><button class="x" type="button" data-close aria-label="Close">×</button></div>
+  <div class="dlg-body">
+    <h4 data-i18n="d.done">Implemented</h4>
+    <ul>
+      <li data-i18n="p.core.a1">Input validation, rate limiting and structured JSON logging shared by the other resources.</li>
+      <li data-i18n="p.core.a2">Booted on a real local FXServer: resource starts, logs its events and answers a console status command.</li>
+    </ul>
+    <h4 data-i18n="d.tests">Verification</h4>
+    <ul>
+      <li data-i18n="p.core.t1">29 offline assertions, 0 failures (2026-10-19).</li>
+      <li data-i18n="p.core.t2">Lesson learned: offline tests with a simulated <code>require</code> hid a real load error. Only the runtime boot exposed it, so it was fixed and covered by new tests.</li>
+    </ul>
+    <h4 data-i18n="d.next">Not done yet</h4>
+    <ul><li data-i18n="p.core.n1">In-game test with a connected client (ping/pong, rate limit, player ACE).</li></ul>
+  </div>
+</dialog>
+
+<dialog id="dlg-oss" aria-labelledby="dlg-oss-t">
+  <div class="dlg-head"><h3 id="dlg-oss-t">Qbox — qbx_core</h3><button class="x" type="button" data-close aria-label="Close">×</button></div>
+  <div class="dlg-body">
+    <h4 data-i18n="d.done">Submitted</h4>
+    <ul>
+      <li data-i18n="p.oss.a1">PR #780 bounds the waits in <code>qbx.spawnVehicle</code> and deletes the created vehicle on timeout (1 file, +16 −3).</li>
+      <li data-i18n="p.oss.a2">Related to issue #678. A reproduction harness fails on the original code and passes with the fix.</li>
+    </ul>
+    <h4 data-i18n="d.status">Current status</h4>
+    <ul>
+      <li data-i18n="p.oss.s1">Open, review required. It has not been merged and nothing here claims it will be.</li>
+      <li data-i18n="p.oss.s2">Validated in a simulated harness. It does not prove the slowdown reported in the issue is gone under real load; that depends on maintainer review and real-world testing.</li>
+    </ul>
+    <p class="dlg-links"><a href="https://github.com/Qbox-project/qbx_core/pull/780" rel="noopener">Pull request #780 ↗</a> · <a href="https://github.com/Qbox-project/qbx_core/issues/678" rel="noopener">Issue #678 ↗</a></p>
+  </div>
+</dialog>
+
+<script src="assets/js/config.js"></script>
+<script src="assets/js/i18n.js"></script>
+<script src="assets/js/main.js"></script>
+</body>
+</html>
