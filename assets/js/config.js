@@ -6,7 +6,7 @@
                     only set this if you accept requests being visible. Empty = option hidden. */
 window.SITE_CONFIG = {
   github: "https://github.com/AtsonMelo",
-  discordUrl: "",
+  discordUrl: "https://discord.gg/JPfR8ekkrj",
   discordHandle: "",
   email: "",
   issuesRepo: ""

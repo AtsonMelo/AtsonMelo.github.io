@@ -75,7 +75,11 @@ with sync_playwright() as pw:
             pg.locator("#quote button[type=submit]").click()
             brief = pg.locator("#q-brief").input_value()
             check("quote: brief generated", "Fix, optimization or maintenance" in brief and "tester#0000" in brief and "Vehicle spawn hangs" in brief, brief)
-            check("quote: no channels configured -> only copy button, no mailto/issue", pg.locator("#brief-actions .btn").count() == 1 and pg.locator("#brief-actions a").count() == 0)
+            direct = int(bool(cfg["discordUrl"])) + int(bool(cfg["email"])) + int(bool(cfg["issuesRepo"]))
+            check("quote actions match configured channels and do not claim the brief was sent",
+                  pg.locator("#brief-actions .btn").count() == 1 + direct
+                  and pg.locator("#brief-actions a[href^='mailto']").count() == int(bool(cfg["email"]))
+                  and ("NOT sent" in pg.locator("#brief-status").inner_text() or "NÃO enviado" in pg.locator("#brief-status").inner_text()))
             check("quote: nothing persisted", pg.evaluate("localStorage.length") == 1 or pg.evaluate("localStorage.length") == 0)
             # demo
             pg.locator("#demo-launch").click()
@@ -94,8 +98,17 @@ with sync_playwright() as pw:
             fr.locator("#btn-x").click(); fr.locator("#hud-button").wait_for(state="visible", timeout=3000); check("demo: close -> HUD button", fr.locator("#hud-button").is_visible())
             fr.locator("#hud-button").click(); fr.locator("#phone").wait_for(state="visible", timeout=3000); check("demo: reopen", fr.locator("#phone").is_visible())
             if shots: pg.locator("#demo").scroll_into_view_if_needed(); pg.wait_for_timeout(300); pg.locator("#demo").screenshot(path=str(shots / "demo-running.png"))
-            check("unconfigured: no Discord button/flow shown, generic flow visible", pg.locator("[data-discord]:visible").count() == 0 and pg.locator("#flow-generic").is_visible() and not pg.locator("#flow-discord").is_visible())
-            check("unconfigured: no discord.gg link anywhere in the DOM", pg.evaluate("[...document.querySelectorAll('a')].every(a => !/discord\\.(gg|com)/.test(a.href))"))
+            if cfg["discordUrl"]:
+                invite = cfg["discordUrl"].rstrip("/")
+                check("configured: Discord button visible and opens the real invite",
+                      pg.locator(".hero [data-discord]").is_visible() and pg.locator("#flow-discord").is_visible() and not pg.locator("#flow-generic").is_visible()
+                      and pg.locator(".hero [data-discord]").get_attribute("href") == invite
+                      and "noopener" in pg.locator(".hero [data-discord]").get_attribute("rel"))
+                check("configured: every discord link is that invite",
+                      pg.evaluate("(url) => [...document.querySelectorAll('a')].filter(a => /discord\\.(gg|com)/.test(a.href)).every(a => a.href.replace(/\\/$/, '') === url)", invite))
+            else:
+                check("unconfigured: no Discord button/flow shown, generic flow visible", pg.locator("[data-discord]:visible").count() == 0 and pg.locator("#flow-generic").is_visible() and not pg.locator("#flow-discord").is_visible())
+                check("unconfigured: no discord.gg link anywhere in the DOM", pg.evaluate("[...document.querySelectorAll('a')].every(a => !/discord\\.(gg|com)/.test(a.href))"))
             # security posture of the demo iframe and the page CSP
             csp = pg.locator("meta[http-equiv=Content-Security-Policy]").get_attribute("content")
             check("page CSP present, no inline script/unsafe-eval/network", csp and "unsafe-inline" not in csp and "unsafe-eval" not in csp and "connect-src 'none'" in csp, str(csp))
@@ -125,7 +138,9 @@ with sync_playwright() as pw:
             check("PT: test indicators translated (no passed/failed)", "passed" not in ptxt and "failed" not in ptxt and "aprovados" in ptxt, "")
             check("PT placeholders translated", "Usuário" in pg.locator("#q-contact").get_attribute("placeholder"))
             if shots: pg.screenshot(path=str(shots / "desktop-pt-top.png"))
+            if cfg["discordUrl"]: check("PT: Discord CTA", "Entrar no Discord" in pg.locator(".hero [data-discord]").inner_text())
             pg.locator("#lang").click(); check("EN restored", pg.locator("h2").first.inner_text() == en)
+            if cfg["discordUrl"]: check("EN: Discord CTA", "Join Discord" in pg.locator(".hero [data-discord]").inner_text())
             # keyboard: first Tab lands on skip link
             pg.reload(); pg.keyboard.press("Tab")
             check("first Tab focuses skip link", pg.evaluate("document.activeElement.className") == "skip")

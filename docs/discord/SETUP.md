@@ -1,6 +1,6 @@
 # DevLab Discord
 
-Applied on 2026-10-19, bot `DevLab Automation` (not Administrator). `LockInternal`, `CreateChannels`, `TightenPublic`, and `PostMessages` ran. No channel was renamed, moved, or deleted. No invite was created. Verification level is still **None** (the bot lacks Manage Guild). Backups are under `%LOCALAPPDATA%\DevLab\discord-backups\`, not in this repo.
+Applied on 2026-10-19, bot `DevLab Automation` (not Administrator). `LockInternal`, `CreateChannels`, `TightenPublic`, and `PostMessages` ran. No channel was renamed, moved, or deleted. Verification level is **Low** (API `verification=1`). The public invite is `https://discord.gg/JPfR8ekkrj`. It does not expire, and the public invite endpoint opens `#boas-vindas` (`1561844477050626090`) on DevLab. Backups are under `%LOCALAPPDATA%\DevLab\discord-backups\`, not in this repo.
 
 ## What is there now
 
@@ -10,7 +10,7 @@ Applied on 2026-10-19, bot `DevLab Automation` (not Administrator). `LockInterna
 | Canais de Texto | `#estrada-smart` | no | Locked in place. Empty. |
 | Canais de Texto | `#github-updates` | no | Locked in place. Empty. Do not attach a webhook until this stays denied. |
 | DEVLAB \| INÍCIO | `#boas-vindas` `#portfolio` `#novidades` | yes, cannot send or write in threads | Prepared text posted once. |
-| DEVLAB \| COMERCIAL | `#solicitar-orcamento` | yes, private threads only | Instructions posted. A second account has not opened a thread yet. |
+| DEVLAB \| COMERCIAL | `#solicitar-orcamento` | yes, private threads only | Instructions posted. Owner confirmed account B could not see account A's thread. |
 | DEVLAB \| COMERCIAL | `#suporte` | yes, can send | Mentions and invites denied. Guidance posted. |
 | DEVLAB \| EQUIPE — PRIVADO | `#dev-interno` | no | Staff rules posted. Not visible to @everyone. |
 | Canais de Voz | `Geral` | yes (connect/speak) | Mentions and invites denied. |
@@ -39,7 +39,7 @@ Private threads are the flow. Discord's API creates a private thread **without**
 
 `#solicitar-orcamento` must deny Send Messages and Create Public Threads so a brief cannot be typed into the channel or into a public thread. The site only copies the brief; it does not send it.
 
-Not proven yet: a non-owner Discord client may hide the private-thread control. The owner's client is not a valid test. After the channel exists, one second account has to open a private thread and another member must confirm they cannot see it. If the client refuses, the visitor posts only `quero um orçamento` in `#suporte` and the owner adds them to a private thread. A resident ticket bot is not justified while that fallback works.
+Proven on 2026-10-19 by the owner: account A opened a private thread and account B could not see it. If a future client hides the private-thread control, the visitor posts only `quero um orçamento` in `#suporte` and the owner adds them to a private thread. A resident ticket bot is not justified while that fallback works.
 
 A future teammate who is not the owner needs Manage Threads on that channel. The bot does not hold Manage Threads, so it cannot grant that bit. The owner sets it in the client, or grants the bit to the bot first.
 
@@ -69,14 +69,14 @@ Rollback: `docs/discord/ROLLBACK.md`.
 
 ## Site
 
-After the invite exists and has been checked:
+The checked invite is in `assets/js/config.js` as `discordUrl`: `https://discord.gg/JPfR8ekkrj`.
 
 ```
-python tools/set-contact.py --discord https://discord.gg/<code> --check-online
+python tools/set-contact.py --discord https://discord.gg/JPfR8ekkrj --check-online
 python tools/preflight.py
 ```
 
-`discordUrl` is what shows **Entrar no Discord** / **Join Discord** and the quote steps. Empty means those controls stay hidden. The quote status must keep saying the brief was not sent.
+`discordUrl` shows **Entrar no Discord** / **Join Discord** and the quote steps. The quote status must keep saying the brief was not sent. The site is not published by this change.
 
 ## GitHub
 
