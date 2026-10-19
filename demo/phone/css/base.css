@@ -1,0 +1,24 @@
+/* The NUI page stays transparent and click-through: only the HUD button and the phone take input.
+   No GPU-heavy effects, no infinite animations: this page is always loaded. */
+html, body { margin: 0; height: 100%; background: transparent; overflow: hidden; font-family: var(--font); color: var(--label); pointer-events: none; }
+[hidden] { display: none !important; }
+button { font: inherit; color: inherit; -webkit-tap-highlight-color: transparent; }
+button:focus-visible, input:focus-visible { outline: 2px solid var(--c-focus); outline-offset: 2px; }
+
+#hud-button {
+  position: fixed; right: var(--hud-right); bottom: var(--hud-bottom);
+  width: 48px; height: 48px; padding: 0; display: grid; place-items: center;
+  border-radius: 15px; border: 1px solid var(--c-line);
+  background: var(--c-graphite); color: var(--c-icon); pointer-events: auto; cursor: default;
+  transition: transform 90ms ease-out, background-color 90ms ease-out;
+}
+#hud-button svg { display: block; }
+/* Focus is ours in CURSOR/PHONE: capture the pointer so mouse movement keeps the cursor mode alive. */
+body[data-mode="CURSOR"], body[data-mode="PHONE"] { pointer-events: auto; }
+body[data-ready="false"] #hud-button { display: none; }
+body[data-hud="hidden"] #hud-button { display: none; }
+body[data-mode="PHONE"] #hud-button { display: none; }
+body[data-mode="CURSOR"] #hud-button { border-color: rgba(114, 216, 245, 0.55); cursor: pointer; }
+body[data-mode="CURSOR"] #hud-button:hover { background: #202a39; }
+body[data-mode="CURSOR"] #hud-button:active { transform: scale(0.95); }
+@media (prefers-reduced-motion: reduce) { #hud-button { transition: none; } }

@@ -1,0 +1,50 @@
+<!doctype html>
+<html lang="pt-BR">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta http-equiv="Content-Security-Policy" content="default-src 'self'; style-src 'self'; script-src 'self'; img-src 'self'; connect-src 'self' https:">
+  <title>DevLab Phone — browser demo (simulated)</title>
+  <link rel="stylesheet" href="css/tokens.css">
+  <link rel="stylesheet" href="css/base.css">
+  <link rel="stylesheet" href="css/phone.css">
+  <link rel="stylesheet" href="demo.css">
+</head>
+<body data-mode="HUD" data-ready="false">
+  <button id="hud-button" type="button" aria-label="Celular">
+    <!-- Lucide-style smartphone, inline so the button never depends on JS or assets -->
+    <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true" focusable="false">
+      <rect x="5" y="2" width="14" height="20" rx="2" ry="2"/><path d="M12 18h.01"/>
+    </svg>
+  </button>
+
+  <main id="phone" aria-label="Celular" data-view="home" hidden>
+    <header id="status-bar">
+      <span id="clock">--:--</span>
+      <span class="island"><span id="island-id" class="island-id" data-testid="island-id">ID —</span><i class="island-cam" aria-hidden="true"></i></span>
+      <span id="device-model" hidden>DevLab</span>
+      <span class="sb-right">
+        <span id="signal" class="signal" data-level="4" role="img" aria-label="Sinal fictício"><i></i><i></i><i></i><i></i></span>
+        <span id="battery" aria-label="Bateria fictícia"></span>
+        <span id="batt" class="batt" aria-hidden="true"><i id="batt-fill"></i></span>
+        <button id="btn-x" type="button" aria-label="Fechar celular">
+          <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true" focusable="false"><path d="M18 6 6 18"/><path d="m6 6 12 12"/></svg>
+        </button>
+      </span>
+    </header>
+    <nav id="nav-top" aria-label="Navegação" hidden>
+      <button id="btn-back" type="button" aria-label="Voltar">
+        <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.6" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true" focusable="false"><path d="m15 18-6-6 6-6"/></svg>
+        <span id="back-label">Voltar</span>
+      </button>
+    </nav>
+    <div id="screen"></div>
+    <footer id="home-bar">
+      <button id="btn-home" type="button" aria-label="Início"><span class="home-indicator"></span></button>
+    </footer>
+  </main>
+
+  <script src="sim.js"></script>
+  <script type="module" src="js/main.js"></script>
+</body>
+</html>

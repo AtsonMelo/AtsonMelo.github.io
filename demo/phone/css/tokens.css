@@ -1,0 +1,29 @@
+:root {
+  /* Approved HUD identity: graphite button #19212D, icon sky blue #72D8F5 */
+  --c-graphite: #19212d;
+  --c-icon: #72d8f5;
+  --c-line: rgba(255, 255, 255, 0.08);
+  --c-focus: #ffd166;
+
+  /* iOS-dark-inspired system palette (own values, no proprietary assets) */
+  --bg: #000;
+  --bg-elev: #1c1c1e;
+  --bg-elev2: #2c2c2e;
+  --fill: rgba(120, 120, 128, 0.24);
+  --sep: rgba(84, 84, 88, 0.6);
+  --label: #fff;
+  --label2: rgba(235, 235, 245, 0.62);
+  --label3: rgba(235, 235, 245, 0.32);
+  --tint: #0a84ff;
+  --tint-soft: rgba(10, 132, 255, 0.16);
+  --green: #30d158;
+  --red: #ff453a;
+  --orange: #ff9f0a;
+  --teal: #40c8e0;
+  --glass: rgba(44, 44, 46, 0.66);
+
+  --hud-right: 24px;
+  --hud-bottom: 24px;
+  /* Local system stack only: SF on Apple, Segoe UI Variable/Segoe on Windows. No web fonts. */
+  --font: -apple-system, BlinkMacSystemFont, "SF Pro Text", "SF Pro Display", "Segoe UI Variable Text", "Segoe UI", system-ui, Roboto, "Helvetica Neue", Arial, sans-serif;
+}
