@@ -1,0 +1,5 @@
+/* Demo-only overrides (the vendored NUI files are never edited). */
+html { color-scheme: dark; }
+html, body { background: transparent; margin: 0; height: 100%; overflow: hidden; }
+#phone { right: 50%; transform: translate(50%, -50%); }
+#hud-button { right: 50%; transform: translateX(50%); }

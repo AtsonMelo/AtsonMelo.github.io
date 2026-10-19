@@ -1,20 +1,21 @@
-# QA and publishing review — 2026-10-19
+# QA and publishing review — V2 (2026-10-19)
 
-## Automated QA (`python tests/qa.py`): 41 passed, 0 failed
-Desktop 1440, tablet 820, mobile 390 (headless Chromium): no console errors/warnings, only same-origin requests, no horizontal scroll, one `h1`, all images loaded with `alt`, anchors resolve, external links https + `rel=noopener`, mobile menu, 4 dialogs open/close (Esc), PT toggle and full PT key coverage, skip link first in tab order, reduced-motion shows all content, no-JS shows hero and projects, contact renders only configured channels.
-Not done: Lighthouse/axe, real-device test, formal contrast measurement (palette chosen for high contrast; muted text #98a4b6 on #0a0d12 ≈ 7.5:1 by calculation).
+## Automated QA (`python tests/qa.py`): see result in the final report
+Covers desktop 1440 / tablet 820 / mobile 390: console clean, same-origin requests only (including the demo iframe), no horizontal scroll, one h1, images loaded with alt, anchors, external links, mobile menu, 4 dialogs, PT/EN (text, alt, placeholders, full key coverage), skip link, reduced motion, no-JS, 4 service cards + CTA preselect, quote form (validation, brief, channel-dependent actions, configured-channel variant), demo (render, vehicle call, PIX receipt, close/reopen, mobile fit), evidence numbers (new total present, stale one absent), static scan (private IPs, secret-like words, local paths).
+Not done: Lighthouse/axe, real devices, formal contrast measurement, in-game verification.
 
-## Claims audit (source: fivem-lab docs + live runs, 2026-10-19)
-| Claim on site | Evidence |
+## Claims audit
+| Claim | Evidence |
 |---|---|
-| 1,152 tests, 0 failed | Re-run today: core 29 + phone Lua 617 + character Lua 389 + UI unit 5 + Chromium e2e 112 |
-| Core booted on real FXServer | `docs/testing.md` 2026-10-18 (loopback, resource started, JSON log) |
-| PR #780 open, +16/−3, 1 file | `gh pr view 780`: OPEN, REVIEW_REQUIRED, not merged |
-| Character/phone not verified in-game | Stated in their docs; shown on the site |
-Screenshots are the NUI in headless Chromium with a simulated bridge (labelled). No clients, testimonials, downloads, certifications or invented contacts.
+| 1,180 tests, 0 failed (snapshot 2026-10-19) | core 29 + phone Lua 617 + character Lua 417 + UI unit 5 + Chromium e2e 112, fivem-lab @ aa99dd7 (working branch) |
+| Core booted on real FXServer | fivem-lab docs/testing.md, 2026-10-18 |
+| PR #780 open, review required | `gh pr view 780`, 2026-10-19 |
+| Core is a reference resource; other resources reuse its patterns, no runtime dependency | manifests: no dependency entries; devlab_phone manifest comment ("same pattern as devlab_core") |
+| Character: per-player persistence, ACE-restricted commands | server/main.lua (resource KVP, IsPlayerAceAllowed); offline tests only |
+V1 text said core was "shared by the other resources": corrected.
 
-## Publishing safety review
-- Files are only the static site (HTML/CSS/JS, 3 phone images, OG image, icons). No source from the private `fivem-lab`, no `server.cfg`/`secrets.cfg`, tokens, IPs, local paths (static scan in `qa.py` passes).
-- Phone screenshots show demo data only (fictional names, fake balance, "simulation" banners); contain a third-party car name ("Bugatti Chiron") in a home widget: trademark use is incidental, but consider swapping the demo vehicle to a generic name and recapturing.
-- The private repo stays private; nothing here references its URL.
-- Pending before going live: Discord/e-mail in `config.js` (optional), user approval (Gate E).
+## Publishing risks to decide (Gate E)
+1. **`demo/phone/` is NUI source code** of a private resource. Publishing it publishes that frontend. It is client-delivered code in any server using it, contains no secrets (scan passes), but it is a decision for the owner.
+2. Demo/screenshots show the model name "Bugatti Chiron" (third-party trademark, incidental). Consider a generic demo vehicle.
+3. Quote destination: no e-mail/Discord configured; public-issue option is off by default.
+4. The tests commit is on a private working branch; the page says so.

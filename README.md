@@ -10,7 +10,8 @@ assets/js/config.js   CONTACT CONFIG — fill in confirmed channels
 assets/js/i18n.js     Portuguese strings (EN lives in the HTML)
 assets/js/main.js     language toggle, menu, dialogs, contact render, reveal
 assets/img/           phone-*.webp (screenshots), og.png, favicon.svg
-tools/                og.html + make-og.py (regenerates the social image)
+tools/                og.html + make-og.py (social image); sync-demo.py + demo/ (phone demo build)
+demo/phone/           GENERATED copy of the phone NUI + in-browser simulator (do not edit by hand)
 tests/qa.py           local QA (console, overflow, links, i18n, dialogs, scan)
 docs/                 QA report, publishing review
 ```
@@ -42,3 +43,17 @@ Edit `assets/js/config.js`. Empty values are not rendered; nothing is invented. 
 
 ## Roll back
 `git revert <commit>` and push (no force push needed), or Settings → Pages → *Unpublish site*. Deleting/making the repo private also takes the site down.
+
+## Phone demo (V2)
+The interactive demo runs the **real** `devlab_phone` NUI inside an iframe, with `tools/demo/sim.js` standing in for FiveM (answers NUI callbacks in-page, no network). Single source of truth stays in the private repo:
+```
+python tools/sync-demo.py --src <path-to-fivem-lab>   # re-vendors web/ into demo/phone/ and records the source commit
+python tests/qa.py                                    # includes demo checks
+```
+**Publishing note:** `demo/phone/` is the phone's NUI frontend source (HTML/CSS/JS). Pushing it makes that code public. Remove it (and the demo section) if you prefer not to.
+
+## Quote form
+No backend. The form builds an English brief in the browser (nothing sent or stored). Actions depend on `assets/js/config.js`: copy always; e-mail if `email`; Discord if `discordUrl`; public GitHub issue if `issuesRepo` (issues are public).
+
+## Evidence numbers
+Dated snapshots, edited by hand in `index.html` (hero float, proof strip, evidence table, dialogs). Re-run the fivem-lab suites (`scripts/test-all.ps1 -Ui`, plus `e2e.py`) and update date/commit before each publish; `tests/qa.py` fails if the old total reappears.
