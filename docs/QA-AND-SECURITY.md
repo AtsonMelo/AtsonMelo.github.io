@@ -44,4 +44,15 @@ axe "needs review" items (not violations): colour contrast on gradient/transluce
 Recommendation: fix in `devlab_phone`, then re-run `sync-demo.py`. They are real accessibility issues of the NUI, independent of the portfolio.
 
 ## 5. Not done
-Real-device testing, in-game verification, post-publish checks (impossible before publishing). Discord layout, permissions, and channel text were applied on 2026-10-19 (see `docs/discord/SETUP.md`). No public invite was created.
+This section is the pre-publication record. At the time of the review: real-device testing, in-game verification, and post-publish checks were still open. Discord layout, permissions, and channel text had been applied on 2026-10-19 (see `docs/discord/SETUP.md`). No public invite had been created yet.
+
+## 6. Publication status (2026-10-19, after section 5)
+The gaps above were closed later the same day. Section 5 stays as the audit record.
+
+| Item | Result |
+|---|---|
+| Public invite | https://discord.gg/JPfR8ekkrj, permanent, opens `#boas-vindas` |
+| Site | https://atsonmelo.github.io/ at `8c1e94d39af23ebdd589fa08d3612f99f54e67ea` |
+| Pages | legacy `main` `/`, HTTPS enforced, build `built` |
+| Public QA | 35/35 on the live URL (desktop, tablet, mobile), Discord button, manual quote warning |
+| Quote flow | Unchanged. The form copies the brief and says it was not sent. |

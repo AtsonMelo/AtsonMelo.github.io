@@ -36,15 +36,17 @@ python tests/qa.py --shots out  # also saves full-page screenshots
 - The current phone images are the NUI rendered in headless Chromium with a simulated FiveM bridge (labelled on the page), not in-game captures.
 
 ## Contacts
-Edit `assets/js/config.js`. Empty values are not rendered; nothing is invented. While Discord and e-mail are empty, the page shows a note and GitHub only.
+Edit `assets/js/config.js`. Empty values are not rendered; nothing is invented. `discordUrl` is the DevLab invite. E-mail stays empty, so no mailto is shown.
 
 ## Publish (GitHub Pages, user site)
 1. Create the **public** repo `AtsonMelo/AtsonMelo.github.io` (exact name).
 2. Push `main`. 3. Settings → Pages → Source: *Deploy from a branch* → `main` / `/ (root)`.
 4. Wait ~1 min; site appears at https://atsonmelo.github.io/. `.nojekyll` is already present.
 
+**Published 2026-10-19.** https://atsonmelo.github.io/ serves `8c1e94d39af23ebdd589fa08d3612f99f54e67ea` from `main` `/`. Public checks on that URL: 35/35. Discord: https://discord.gg/JPfR8ekkrj (`#boas-vindas`). `main` requires a pull request, including for admins; force push and branch deletion are off.
+
 ## Roll back
-`git revert <commit>` and push (no force push needed), or Settings → Pages → *Unpublish site*. Deleting/making the repo private also takes the site down.
+Revert the commit through a pull request. Pages rebuilds from the new `main` tip. Do not unpublish as the first response to a documentation or Discord-text mistake. Unpublish (Settings → Pages, or make the repo private) only to take the site offline. Direct push and force push to `main` are rejected.
 
 ## Phone demo (V2)
 The interactive demo runs the **real** `devlab_phone` NUI inside an iframe, with `tools/demo/sim.js` standing in for FiveM (answers NUI callbacks in-page, no network). Single source of truth stays in the private repo:
@@ -55,7 +57,7 @@ python tests/qa.py                                    # includes demo checks
 **Publishing note:** `demo/phone/` is the phone's NUI frontend source (HTML/CSS/JS). Pushing it makes that code public. Remove it (and the demo section) if you prefer not to.
 
 ## Quote form
-No backend. The form builds an English brief in the browser (nothing sent or stored). Actions depend on `assets/js/config.js`: copy always; e-mail if `email`; Discord if `discordUrl`; public GitHub issue if `issuesRepo` (issues are public).
+No backend. The form builds an English brief in the browser (nothing sent or stored). Actions depend on `assets/js/config.js`: copy always; e-mail if `email`; Discord if `discordUrl`; public GitHub issue if `issuesRepo` (issues are public). The published site keeps this manual flow.
 
 ## Evidence numbers
 Dated snapshots, edited by hand in `index.html` (hero float, proof strip, evidence table, dialogs). Re-run the fivem-lab suites (`scripts/test-all.ps1 -Ui`, plus `e2e.py`) and update date/commit before each publish; `tests/qa.py` fails if the old total reappears.

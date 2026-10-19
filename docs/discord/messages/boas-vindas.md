@@ -1,5 +1,5 @@
 **Bem-vindo ao DevLab**
-Laboratório de desenvolvimento FiveM de **Atson Melo**: recursos em Lua, interfaces NUI e integrações, com testes automatizados. O código dos recursos é privado; o que está pronto, em desenvolvimento ou só demonstrado fica explícito.
+Laboratório FiveM de **Atson Melo**: Lua, NUI e integrações. O código dos recursos é privado; pronto, em desenvolvimento ou só demonstrado fica explícito. O portfólio está publicado em https://atsonmelo.github.io/. Este Discord é a comunidade e o contato.
 
 **Por aqui você pode**
 • ver os projetos em <#portfolio>;
@@ -17,7 +17,7 @@ Laboratório de desenvolvimento FiveM de **Atson Melo**: recursos em Lua, interf
 
 ---
 **Welcome to DevLab**
-FiveM development lab by **Atson Melo**: Lua resources, NUI interfaces, and integrations, backed by automated tests. Resource source is private; what is done, in development, or only demonstrated is stated as such.
+FiveM lab by **Atson Melo**: Lua, NUI, and integrations. Resource source is private; done, in development, or demonstrated only is stated as such. The portfolio is published at https://atsonmelo.github.io/. This Discord is the community and contact channel.
 
 **What you can do here**
 • see the projects in <#portfolio>;
